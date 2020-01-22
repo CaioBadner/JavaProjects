@@ -1,0 +1,288 @@
+import javax.swing.JOptionPane;
+
+public class ChessGame {
+
+	public static char [][] board = newBoard();
+	
+	public static int round = 1, realRound = 1;
+	
+	public static boolean isWhiteToMove = true;
+
+	public static void main(String[] args) {
+		
+		boolean isCheckMate = false, isStaleMate = false, isDraw = false;
+		
+		
+		
+		String move, lastMove = null;	
+		
+
+		do {
+			
+		
+		printBoard(lastMove);
+		
+		//calculateMoves(board);
+		
+		
+		
+		if (round % 2 == 0) {
+			move = JOptionPane.showInputDialog(realRound + ". " + lastMove + "...\nBlack to move: ");
+		} else {
+			if (round > 1) {
+				move = JOptionPane.showInputDialog((realRound-1) + "..." + lastMove + "\n" + realRound + ".\nWhite to move: ");
+			} else {
+				move = JOptionPane.showInputDialog(realRound + ".\nWhite to move: ");
+				
+			}
+			
+		}
+		
+		makeMove(move);
+			
+			lastMove = move;
+			round ++;
+			isWhiteToMove = !isWhiteToMove;
+			realRound = (round/2);
+			if (round % 2 != 0) {
+				realRound++;
+			} 
+		} while(!isCheckMate && !isStaleMate && !isDraw);
+		
+}	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	/*
+	
+	private static void calculateMoves(char[][] board) {
+		
+		//first check all the pawn moves
+		for (int y = 0; y < board.length; y++) {
+			
+		}
+		//if (board[1][0] = && \)
+	}
+
+*/
+
+
+
+
+
+
+
+
+
+
+
+	private static void makeMove(String move) {
+		int x, y;
+		char piece, origin;
+		
+		//breaking up the original move into characters		
+		if (move.length() == 3) {
+			piece = move.charAt(0);
+			x = translateXMoves(move.charAt(1));
+			y = translateYMoves(move.charAt(2));
+		} else if (move.length() == 4) {
+			piece = move.charAt(0);
+			x = translateXMoves(move.charAt(2));
+			y = translateYMoves(move.charAt(3));
+		} else if (move.length() == 5) {
+			piece = move.charAt(0);
+			origin = move.charAt(1);
+			x = translateXMoves(move.charAt(3));
+			y = translateYMoves(move.charAt(4));
+		} else {
+			x = translateXMoves(move.charAt(0));
+			y = translateYMoves(move.charAt(1));
+		}
+			
+		//we check if it's a pawn move
+		if (move.length() == 2) {
+			if (isWhiteToMove) {
+				board[y][x] = 'P';
+			} else {
+				board[y][x] = 'p';
+			}
+			
+			if (y == 3) {
+				if (isWhiteToMove) {
+					if (board[y-2][x] == 'P') {
+						board[y-2][x] = ' ';
+					} else {
+						board[y-1][x] = ' ';
+					}
+					
+				} else {
+					board[y+1][x] = ' ';
+				}
+			} else if (y == 4) {
+				if (isWhiteToMove) {
+					board[y-1][x] = ' ';
+				} else {
+					if (board[y+2][x] == 'p') {
+					board[y+2][x] = ' ';
+					} else {
+						board[y+1][x] = ' ';
+					}
+				}
+			} else {
+				if (isWhiteToMove) {
+					board[y-1][x] = ' ';
+				} else {
+					board[y+1][x] = ' ';
+				}
+			}
+		}
+		
+		
+		return;
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+	private static int translateYMoves(char oldY) {
+		int y;
+		
+		if (oldY == '8') {
+			y = 7;
+		} else if (oldY == '7') {
+			y = 6;
+		} else if (oldY == '6') {
+			y = 5;
+		} else if (oldY == '5') {
+			y = 4;
+		} else if (oldY == '4') {
+			y = 3;
+		} else if (oldY == '3') {
+			y = 2;
+		} else if (oldY == '2') {
+			y = 1;
+		} else {
+			y = 0;
+		}
+		return y;
+	}
+
+	private static int translateXMoves(char oldX) {
+		int x;
+		
+		if (oldX == 'a') {
+			x = 0;
+		} else if (oldX == 'b') {
+			x = 1;
+		} else if (oldX == 'c') {
+			x = 2;
+		} else if (oldX == 'd') {
+			x = 3;
+		} else if (oldX == 'e') {
+			x = 4;
+		} else if (oldX == 'f') {
+			x = 5;
+		} else if (oldX == 'g') {
+			x = 6;
+		} else {
+			x = 7;
+		}
+		return x;
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+	private static char[][] newBoard() {
+		char [][] board = new char[8][8];
+		
+		for (int y = 0; y < board.length; y++) {
+			for (int x = 0; x < board.length; x++) {
+				if (y == 0) {
+					if (x == 0 || x == 7) {
+						board[y][x] = 'R';
+					} else if (x == 1 || x == 6) {
+						board[y][x] = 'N';
+					} else if (x == 2 || x == 5) {
+						board[y][x] = 'B';
+					} else if (x == 3) {
+						board[y][x] = 'Q';
+					} else {
+						board[y][x] = 'K';
+					}
+				} else if (y == 7) {
+					if (x == 0 || x == 7) {
+						board[y][x] = 'r';
+					} else if (x == 1 || x == 6) {
+						board[y][x] = 'n';
+					} else if (x == 2 || x == 5) {
+						board[y][x] = 'b';
+					} else if (x == 3) {
+						board[y][x] = 'q';
+					} else {
+						board[y][x] = 'k';
+					}
+				} else if (y == 1) {
+					board[y][x] = 'P';	
+				} else if (y == 6) {
+					board[y][x] = 'p';	
+				}
+			}
+		}
+		return board;
+	}
+
+	private static void printBoard(String lastMove) {
+		
+		
+			
+		for (int y = 7; y >= 0; y--) {
+			System.out.println();
+			System.out.print("[" + (y+1) + "] ");
+			for (int x = 0; x < 8; x++) {
+				System.out.print("[" + board[y][x] + "] ");
+			}
+		}
+		System.out.println("\n[X] [A] [B] [C] [D] [E] [F] [G] [H]  ");
+		System.out.println();
+		
+		if (round % 2 == 0) {
+			System.out.println(realRound + ". " + lastMove + "...\nBlack to move: ");
+		} else {
+			if (round > 1) {
+				System.out.println((realRound-1) + "..." + lastMove + "\n" + realRound + ".\nWhite to move: ");
+			} else {
+				System.out.println(realRound + ".\nWhite to move: ");
+				
+			}
+			
+		}
+	}
+
+}

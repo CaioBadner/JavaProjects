@@ -52,18 +52,15 @@ public class ArrayMerger {
 		//         
 		//      Option 0 = leaves the array as it is, with a1 followed by a2
 		//      Option 1 = sorts the new array numerically from smallest to largest
-		// 		Option 2 = sorts the new array numerically from largest to smallest
+		// 	Option 2 = sorts the new array numerically but from largest to smallest
 		
+		//examples
 		
-		int[] array3 = RandomArrayMaker.randomArrayMaker(false, 5, true, 100);
-		
-				
+		int[] array3 = {12,45,23,67,44,87,34,12,56};
 		System.out.println(Arrays.toString(array3));
 		System.out.println();
 		
-		int[] array4 = RandomArrayMaker.randomArrayMaker(false, 5, true, 100);
-		
-		
+		int[] array4 = {45,89,78,67,56,45,56,67,56,12,31,41,51};
 		System.out.println(Arrays.toString(array4));
 		System.out.println();
 		
@@ -75,8 +72,9 @@ public class ArrayMerger {
 		// 
 		//int[] array5 = superArrayMerger(array3, array4, true, 2);
 		
-		int[] array5 = superArrayMerger(array3, array4, false, 2);
 		
+		//this will combinee] the two arrays and then sort the new array numerically from smallest to largest
+		int[] array5 = superArrayMerger(array3, array4, false, 1);
 		System.out.println(Arrays.toString(array5));
 		System.out.println();
 		

@@ -1,126 +1,236 @@
-import java.util.Random;
+import java.util.Arrays;
 
 public class ArrayMerger {
 
 	public static void main(String[] args) {
 		
-		// randomArrayMaker(boolean, int, boolean, int) 
-		//
-		// it's a function that can be added to any project 
-		// and it will return one array of the int[] type
-		// filled with randomly generated positive integer values
+		
+		
+		
+		
+		// superArrayMerger (int [], int [], boolean, int)
 		// 
-		// it needs 4 parameters: 
-		//  1 - should the length be random? (true/false)
-		//
-		//	2 - a number that will either serve as: 
-		//		the max length of the array (if 1 is true)
-		//      or the real length of the array (if 1 is false)
 		// 
-		//	3 - should the cells be in a random order ? 
-		//      true - returns an array whose cells aren't organised according to their values
-		//		false - returns an array whose values range from smallest to largest  
+		// It's another simple and useful function that takes two arrays and 
+		// combines it into a new one.
+		// 
+		// It has a few options that can be used through its 4 parameters:
+		// 
+		//  1 & 2 - the two arrays containing integers to be combined
 		//
-		//  4 - a number that will serve as the max value base for all the random values
-		//      that will be generated to fill up all the cells of the array
-		         
-			                                    
-		// examples of usage
+		//  3 - this asks the user if he wants to merge the two arrays or not
+		//      
+		//      (true) -  if the arrays are the same length, 
+		//              the function will combine the two arrays into a new one, 
+		//				adding up their values (or performing a different operation according 
+		//              to the next parameter)
+		//               if the arrays aren't the same length the function will return an empty array
+		//     
+		//
+		//  or (false) - this will create a longer array while preserving all the initial values 
+		//               performing a simple concatenation where array1 will come before array2
+		//                                                                       
+		//	4 - This parameter has multiple uses and it gives you different options depending 
+		//	    on your previous choices. 
+		//        
+		//         If 3 was true, then the number entered here will decide which mathematical operation 
+		//         will be performed between the cells of the same sized arrays
+		//
+		//      Option 0 = + 
+		//      Option 1 = - 
+		//      Option 2 = * 
+		//      Option 3 = / 
+		//      Option 4 = % 
+		//      Option 5 = max 
+		//      Option 6 = min 
+		//      All other options = + 
+		//     
+		//     Obs.: Options 3 and 4 will return '0' if one of the cells = 0;
+		// 
+		//         But if 3 was false, then this parameter will decide whether or not to sort the new
+		//         concatenated array. 
+		//         
+		//      Option 0 = leaves the array as it is, with a1 followed by a2
+		//      Option 1 = sorts the new array numerically from smallest to largest
+		// 		Option 2 = sorts the new array numerically from largest to smallest
 		
-		int[] array1 = randomArrayMaker(true, 10, true, 200);
-		// ^
-		// this returns an array that has a random length (1-10) 
-		// and random values (0-199) in a random order
 		
-		System.out.println(array1.length + "\n");
-		for (int i = 0; i < array1.length; i++) {
-			System.out.print(array1[i] + " ");
-		}
+		int[] array3 = RandomArrayMaker.randomArrayMaker(false, 5, true, 100);
 		
-		// int[] array2 = randomArrayMaker(false, 5, false, 20);
-		// ^	
-		// this would return one with a length of 10 and 
-		// the values will all range (0-19) but they will be not in a random order,
-		// they will be in numerical order ranging from smallest to largest
+				
+		System.out.println(Arrays.toString(array3));
+		System.out.println();
+		
+		int[] array4 = RandomArrayMaker.randomArrayMaker(false, 5, true, 100);
 		
 		
-		//I still haven't learned exception handling so try not to go crazy 
-		//with the values and fry your computer :)
+		System.out.println(Arrays.toString(array4));
+		System.out.println();
+		
+		// sample usage
+		// 
+		// this will return an array like this:
+		//
+		//   array5[n] = array3[n] * array4[n]
+		// 
+		//int[] array5 = superArrayMerger(array3, array4, true, 2);
+		
+		int[] array5 = superArrayMerger(array3, array4, false, 2);
+		
+		System.out.println(Arrays.toString(array5));
+		System.out.println();
+		
 		
 		
 	}
 
 		
-	private static int[] randomArrayMaker(boolean randomLength, int length, boolean randomOrder, int maxValue) {
+	
+	
+	
+	
+
+	
+	private static int[] superArrayMerger(int[] a1, int[] a2, boolean mergeArrays, int option) {
 		
-		//first we check if the user wants the size of the array to be random
-		if (randomLength == true) {
-			Random rand = new Random();
-			length = rand.nextInt(length) + 1;
-		} 
+				
+		int length;
+	
 		
-		//then we create the array using either the original length or the new random one
-		int[] array = new int[length];
 		
-		//now we will fill up the array with random numbers based on the second number given
-		int counter = 0;
-		int tempCell;
+		//Here we decide the length based on the two options
+		if (mergeArrays == true) {
+			length = a1.length;
+		} else {
+			length = a1.length + a2.length;
+		}
 		
-		do {
-			
-			Random rand = new Random();
-			
-			//first we check if he wants a randomly ordered array
-			if (randomOrder == false) {
-				// false - means the user actually wants the cells to be ordered according 
-				// to their numerical value
+		//Then we create the empty array
+		int [] array = new int[length];
+		
+		
+	
+			//this the loop that will fill up the array
+			for (int counter = 0; counter < length; counter++) {
 				
 				
-				//here we generate the first number before the loop starts
-				array[counter] = rand.nextInt(maxValue);
-				
-				//this is to skip the useless first round
-				if (counter > 0) {
+				if (mergeArrays == true) { 
 					
-					//now, starting from the second round, 
-					//we will do a reverse loop, going back with this value to check 
-					//where it fits in our numerically ordered array
-					for (int reverseCounter = counter; reverseCounter > 0; reverseCounter --) {
+					if (a1.length == a2.length) {
 						
+						//These are all the arithmetical operations the function allows
+						//With 0 and ELSE being the triggers for the addition mode
+						if (option == 0) {
+				
+							array[counter] = a1[counter] + a2[counter];
+					
+						} else if (option == 1) {
 						
-						// so starting from the current position, we compare two cells						
-						if (array[reverseCounter] < array[reverseCounter-1]) {
+							array[counter] = a1[counter] - a2[counter];
+						
+						} else if (option == 2) {
+					
+							array[counter] = a1[counter] * a2[counter];
+					
+						} else if (option == 3) {
 							
-							//these are the three steps that make the values trade places
-							tempCell = array[reverseCounter];
-							array[reverseCounter] = array[reverseCounter - 1];
-							array[reverseCounter - 1] = tempCell; 
-							
-						} else { 
+							//avoiding division by 0
+							if (a1[counter] != 0 && a2[counter] != 0) {
+							array[counter] = a1[counter] / a2[counter];
+							} else {
+								array[counter] = 0;
+							}
 						
-							//here we BREAK from this loop when the value is bigger 
-							//or equal to the one before;
-							//
-							//may Avi forgive me :)
-							break;
+						} else if (option == 4) {
+						
+							//avoiding division by 0
+							if (a1[counter] != 0 && a2[counter] != 0) {
+								array[counter] = a1[counter] % a2[counter];
+								} else {
+									array[counter] = 0;
+								}
+					
+						} else if (option == 5) {
+						
+							array[counter] = Math.max(a1[counter],a2[counter]);
+						
+						} else if (option == 6) {
+						
+							array[counter] = Math.min(a1[counter],a2[counter]);
+						
+						} else {
+						
+							array[counter] = a1[counter] + a2[counter];
+					
+						} 
+					
+					} else { 
+						//this returns the empty array in case they are not the same size
+						return array;
+					}
+				
+					
+				//here we go into the options if the user wants to concatenate the two arrays
+				} else {	
+					
+					
+						//basic concatenation of two arrays, a1 followed by a2 in their original order	
+						if (counter < a1.length) {
+								array[counter] = a1[counter];
+							} else {
+								array[counter] = a2[counter - a1.length];
+							}
+				}
+				
+				
+			}
+				
+				//and these are the two sub-methods that will sort the array after it's been created
+				// this will sort it in an ascending order
+				if (mergeArrays == false && option == 1) {
+					
+				int backward = 1;	
+					for (int forward = 1; forward < array.length; forward++) {
+						if (array[forward] < array[forward-1]) {
+							backward = forward;
+							do {
+								int temp = array[backward];
+								array[backward] = array[backward-1];
+								array[backward-1] = temp;
+								backward --;
+								if (backward == 0) {
+									break;
+								}
+							} while (array[backward] < array[backward-1]);
+						}
+					}
+				
+				// and this will sort it in a descending order	
+				} else if (mergeArrays == false && option == 2) {
+					int backward = 1;	
+					for (int forward = 1; forward < array.length; forward++) {
+						if (array[forward] > array[forward-1]) {
+							backward = forward;
+							do {
+								int temp = array[backward];
+								array[backward] = array[backward-1];
+								array[backward-1] = temp;
+								backward --;
+								if (backward == 0) {
+									break;
+								}
+							} while (array[backward] > array[backward-1]);
 						}
 					}
 					
 				}
-			} else {
-				
-				//this is when the order is supposed to be random 
-				// so just add the current random value to the current cell and move along
-				array[counter] = rand.nextInt(maxValue);
-				
-			}
 			
-			counter++; 
-			
-		} while (counter < length) ;
-		
-		
 		return array;
 	}
+
+
+	
+	
 //CaioBadner2020
 }
+

@@ -1,0 +1,126 @@
+import java.util.Random;
+
+public class RandomArrayMaker {
+	// randomArrayMaker(boolean, int, boolean, int) 
+			//
+			// it's a function that can be added to any project 
+			// and it will return one array of the int[] type
+			// filled with randomly generated positive integer values
+			// 
+			// it needs 4 parameters: 
+			//  1 - should the length be random? (true/false)
+			//
+			//	2 - a number that will either serve as: 
+			//		the max length of the array (if 1 is true)
+			//      or the real length of the array (if 1 is false)
+			// 
+			//	3 - should the cells be in a random order ? 
+			//      true - returns an array whose cells aren't organised according to their values
+			//		false - returns an array whose values range from smallest to largest  
+			//
+			//  4 - a number that will serve as the max value base for all the random values
+			//      that will be generated to fill up all the cells of the array
+			         
+			/*	                                    
+			// examples of usage:
+			//
+			int[] array1 = randomArrayMaker(true, 10, true, 200);
+			// ^
+			// this returns an array that has a random length (1-10) 
+			// and random values (0-199) in a random order
+			
+			System.out.println(array1.length + "\n");
+			for (int i = 0; i < array1.length; i++) {
+				System.out.print(array1[i] + " ");
+			}
+			System.out.println();
+			
+			int[] array2 = randomArrayMaker(false, 10, false, 20);
+			// ^	
+			// this would return one with a length of 10 and 
+			// the values will all range (0-19) but they will be not in a random order,
+			// they will be in numerical order ranging from smallest to largest
+			
+			System.out.println( "\n" + array2.length + "\n");
+			for (int i = 0; i < array2.length; i++) {
+				System.out.print(array2[i] + " ");
+			}
+			System.out.println();
+			*/
+			
+			//I still haven't learned exception handling so try not to go crazy 
+			//with the values and fry your computer :)
+	
+	public static int[] randomArrayMaker(boolean randomLength, int length, boolean randomOrder, int maxValue) {
+		
+		//first we check if the user wants the size of the array to be random
+		if (randomLength == true) {
+			Random rand = new Random();
+			length = rand.nextInt(length) + 1;
+		} 
+		
+		//then we create the array using either the original length or the new random one
+		int[] array = new int[length];
+		
+		//now we will fill up the array with random numbers based on the second number given
+		int counter = 0;
+		int tempCell;
+		
+		do {
+			
+			Random rand = new Random();
+			
+			//first we check if he wants a randomly ordered array
+			if (randomOrder == false) {
+				// false - means the user actually wants the cells to be ordered according 
+				// to their numerical value
+				
+				
+				//here we generate the first number before the loop starts
+				array[counter] = rand.nextInt(maxValue);
+				
+				//this is to skip the useless first round
+				if (counter > 0) {
+					
+					//now, starting from the second round, 
+					//we will do a reverse loop, going back with this value to check 
+					//where it fits in our numerically ordered array
+					for (int reverseCounter = counter; reverseCounter > 0; reverseCounter --) {
+						
+						
+						// so starting from the current position, we compare two cells						
+						if (array[reverseCounter] < array[reverseCounter-1]) {
+							
+							//these are the three steps that make the values trade places
+							tempCell = array[reverseCounter];
+							array[reverseCounter] = array[reverseCounter - 1];
+							array[reverseCounter - 1] = tempCell; 
+							
+						} else { 
+						
+							//here we BREAK from this loop when the value is bigger 
+							//or equal to the one before;
+							//
+							//may Avi forgive me :)
+							break;
+						}
+					}
+				}
+			
+			} else {
+				
+				//this is when the order is supposed to be random 
+				// so just add the current random value to the current cell and move along
+				array[counter] = rand.nextInt(maxValue);
+				
+			}
+			
+			counter++; 
+			
+		} while (counter < length) ;
+		
+		
+		return array;
+	}
+	
+}

@@ -43,6 +43,10 @@ public class BinarySearch {
 			}
 		}
 		
+		if (found == 0) {
+			return found;
+		}
+		
 		int copy = num;
 		
 		while (a[place] == copy) {

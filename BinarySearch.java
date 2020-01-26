@@ -14,7 +14,8 @@ public class BinarySearch {
 		int num = Integer.parseInt(JOptionPane.showInputDialog("What number do you want me to look for?"));
 		
 		
-		JOptionPane.showMessageDialog(null, "The number " + num + " was seen " + howManyOccurences(array,num) + " times in the array.");
+		JOptionPane.showMessageDialog(null, "The number " + num + " was seen " + howManyOccurences(array,num) + 
+					      " times in the array.");
 		} while (JOptionPane.showConfirmDialog(null, "Another one?", "",JOptionPane.YES_NO_OPTION) == 0);
 	}
 
@@ -31,7 +32,9 @@ public class BinarySearch {
 		
 			if (a[middle] == num) {
 				
-				place = middle;
+				found ++;
+				place = middle - 1;
+				//I used this instead of a simple BREAK because these variables won't be used again
 				start = end + 1;
 				
 			} else if (a[middle] < num) {
@@ -42,7 +45,7 @@ public class BinarySearch {
 				
 			}
 		}
-		
+		//this skips the whole second part if the number wasnt found
 		if (found == 0) {
 			return found;
 		}
@@ -54,6 +57,7 @@ public class BinarySearch {
 			found ++;
 			
 			if (place == 0) {
+				//again, I left the loops by invalidating the main condition of the
 				copy = a[place] - 1;
 			} else {
 			
@@ -69,6 +73,7 @@ public class BinarySearch {
 			found ++;
 			
 			if (place == a.length - 1) {
+				//here one last time we change the variable to get a safe way out of the loop
 				copy ++;
 			} else {
 			

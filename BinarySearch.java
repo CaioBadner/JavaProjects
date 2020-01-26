@@ -6,86 +6,95 @@ public class BinarySearch {
 
 	public static void main(String[] args) {
 		
-		//int[] array = RandomArrayMaker.randomArrayMaker(false, 174, false, 100);
+		//int[] array = RandomArrayMaker.randomArrayMaker(false, 100, false, 20);
 		
-		int [] array = {2,2,2,2,2,2,2,2,2,2};
+		int [] array = {1,1,1,1,1,11,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,16};
 		System.out.println(Arrays.toString(array));
 		do {
 		int num = Integer.parseInt(JOptionPane.showInputDialog("What number do you want me to look for?"));
+		int answer;
+		int left = findLeft(array, num);
 		
-		
-		JOptionPane.showMessageDialog(null, "The number " + num + " was seen " + howManyOccurences(array,num) + 
-					      " times in the array.");
+		if (left == -1) {
+			answer = 0;
+		} else {
+			int right = findRight(array, left, num);
+			answer = right - left + 1;
+		}
+		JOptionPane.showMessageDialog(null, "The number " + num + " was seen " + answer + " times in the array.");
 		} while (JOptionPane.showConfirmDialog(null, "Another one?", "",JOptionPane.YES_NO_OPTION) == 0);
 	}
-
-	private static int howManyOccurences(int[] a, int num) {
-		int found = 0;
+	
+	private static int findLeft(int[] a, int num) {
+		int left;
+		
+		if (a[0] == num) {
+			left = 0;
+			return left;
+		}
 		
 		int start = 0;
 		int end = a.length - 1;
-		int place = 0, middle = 0;
-				
+		
+		
 		while (start <= end) {
 			
-			middle = (start + end) / 2;
+			left = (start + end) / 2;
 		
-			if (a[middle] == num) {
-				
-				found ++;
-				place = middle - 1;
-				//I used this instead of a simple BREAK because these variables won't be used again
-				start = end + 1;
-				
-			} else if (a[middle] < num) {
-				start = middle + 1;
-						
+			if (a[left] == num) {
+				if (a[left - 1] != num) {
+					return left;
+				} else {
+					end = left - 1;
+				}
+							
+			} else if (a[left] < num) {
+				start = left + 1;
 			} else {
-				end = middle - 1;
+				end = left - 1;
 				
 			}
 		}
-		//this skips the whole second part if the number wasnt found
-		if (found == 0) {
-			return found;
+		
+		left = -1;
+		return left;
+	}	
+	
+	private static int findRight(int[] a, int left, int num) {
+		int right = 0;
+		int start = left;
+		int end = a.length - 1;
+		
+		if (a[end] == num) {
+			right = end;
+			return right;
 		}
 		
-		int copy = num;
+		end --;
 		
-		while (a[place] == copy) {
+		while (start <= end) {
 			
-			found ++;
-			
-			if (place == 0) {
-				//again, I left the loops by invalidating the main condition of the
-				copy = a[place] - 1;
+			right = (start + end) / 2;
+		
+			if (a[right] == num) {
+				
+				if (a[right + 1] != num) {
+					return right;
+				} else {
+					start = right + 1;
+				}
+				
+			} else if (a[right] < num) {
+				start = right + 1;
 			} else {
-			
-				place --;
+				end = right - 1;
 			}
 		}
 		
-		copy = num;
-		place = middle + 1;
-		
-		while (a[place] == copy) {
-			
-			found ++;
-			
-			if (place == a.length - 1) {
-				//here one last time we change the variable to get a safe way out of the loop
-				copy ++;
-			} else {
-			
-				place ++;
-			}
-		}
-		
-		
-		return found;
-		
+		return right;
 	}
-	
-	
 
+	
 }
+
+	

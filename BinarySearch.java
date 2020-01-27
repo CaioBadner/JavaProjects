@@ -6,25 +6,39 @@ public class BinarySearch {
 
 	public static void main(String[] args) {
 		
-		//int[] array = RandomArrayMaker.randomArrayMaker(false, 100, false, 20);
+		int[] array = RandomArrayMaker.randomArrayMaker(false, 100, false, 20);
 		
-		int [] array = {1,1,1,1,1,11,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,16};
+		//int [] array = {1,2,3,4,5,6,7,8,9,11,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,16};
 		System.out.println(Arrays.toString(array));
 		do {
-		int num = Integer.parseInt(JOptionPane.showInputDialog("What number do you want me to look for?"));
-		int answer;
-		int left = findLeft(array, num);
 		
-		if (left == -1) {
-			answer = 0;
-		} else {
-			int right = findRight(array, left, num);
-			answer = right - left + 1;
-		}
-		JOptionPane.showMessageDialog(null, "The number " + num + " was seen " + answer + " times in the array.");
+			int num = Integer.parseInt(JOptionPane.showInputDialog("What number do you want me to look for?"));
+		
+			int answer = checkAnswer(array, num);
+		
+			JOptionPane.showMessageDialog(null, "The number " + num + " was seen " + answer + " times in the array.");
+		
 		} while (JOptionPane.showConfirmDialog(null, "Another one?", "",JOptionPane.YES_NO_OPTION) == 0);
 	}
 	
+	private static int checkAnswer(int[] a, int num) {
+		int answer = 0;
+		if (num < a[0] || num > a[a.length - 1]) {
+			return answer;
+		}
+		
+		int left = findLeft(a, num);
+		
+		if (left == -1) {
+			return answer;
+		} 
+		else {
+			int right = findRight(a, left, num);
+			answer = right - left + 1;
+			return answer;
+		}
+	}
+
 	private static int findLeft(int[] a, int num) {
 		int left;
 		
@@ -33,12 +47,10 @@ public class BinarySearch {
 			return left;
 		}
 		
-		int start = 0;
+		int start = 1;
 		int end = a.length - 1;
 		
-		
 		while (start <= end) {
-			
 			left = (start + end) / 2;
 		
 			if (a[left] == num) {
@@ -52,10 +64,8 @@ public class BinarySearch {
 				start = left + 1;
 			} else {
 				end = left - 1;
-				
 			}
 		}
-		
 		left = -1;
 		return left;
 	}	

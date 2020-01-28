@@ -13,7 +13,7 @@ public class Main {
 		
 		do {
 			if (JOptionPane.showConfirmDialog(null, "Hello, would you like to open an account with " + 
-											bank.getName() + "?", TITLE, JOptionPane.YES_NO_OPTION) == 0) 
+							bank.getName() + "?", TITLE, JOptionPane.YES_NO_OPTION) == 0) 
 			{
 				bank.clientList.add(openNewAccount(bank.getName()));
 				//bank.clientList.add(new Client("Name","Last","0230123","Street",34,5000));

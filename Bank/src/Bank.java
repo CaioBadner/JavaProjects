@@ -33,22 +33,24 @@ public class Bank {
 	public void setOwner(String owner) {
 		this.owner = owner;
 	}
-
+	
 	public double getTotalMoney() {
 		return updateTotalMoney();
 	}
 
 	public double updateTotalMoney() {
 		
-		this.totalMoney = 0;
+		totalMoney = 0;
 		
-		for (int i = 0; i < this.getClientList().size(); i++) 
+		for (int i = 0; i < getClientList().size(); i++) 
 		{
-			this.totalMoney += this.clientList.get(i).getAccountBalance();
+			totalMoney += clientList.get(i).getAccountBalance();
 		}
 		return totalMoney;
 	}
 
+	
+	
 	public boolean isInsured() {
 		return isInsured;
 	}
@@ -73,14 +75,14 @@ public class Bank {
 		
 		String not = "";
 		
-		if (this.isInsured == false) {
+		if (isInsured == false) {
 			not = "not ";
 		}
 		
-		String safe = String.format("%10.2f", this.getTotalMoney());
+		String safe = String.format("%10.2f", getTotalMoney());
 		
-		String state = ("\n" + this.getName() + "\nOwned by "
-				+ this.getOwner() + "\nThe bank is " + not + "insured"
+		String state = ("\n" + getName() + "\nOwned by "
+				+ getOwner() + "\nThe bank is " + not + "insured"
 				+ "\nThere is currently " + safe
 				+ " $ available in the safe" + "\n");
 				
@@ -90,3 +92,4 @@ public class Bank {
 
 	
 }
+

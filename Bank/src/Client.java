@@ -33,25 +33,25 @@ public class Client {
 	}
 	
 	public String getInfo() {
-		String money = String.format("%6.2f", this.getAccountBalance());
+		String money = String.format("%6.2f", getAccountBalance());
 		
-		String info = ("ACCOUNT NUMBER: " + this.getAccountNumber() +
-						"\nNAME: " + this.getFirstName() + " " + this.getLastName() + 
-						"\nAGE: " + this.getAge() + "   ID: " + this.getiD() +
-						"\nADDRESS: " + this.getAddress() + 
+		String info = ("ACCOUNT NUMBER: " + getAccountNumber() +
+						"\nNAME: " + getFirstName() + " " + getLastName() + 
+						"\nAGE: " + getAge() + "   ID: " + getiD() +
+						"\nADDRESS: " + getAddress() + 
 						"\nACCOUNT BALANCE: " + money + " $");
 				
 		return info;
 	}
 
 	public void makeDeposit(int value) {
-		float balance = this.getAccountBalance() + value;
-		this.setAccountBalance(balance);
+		float balance = getAccountBalance() + value;
+		setAccountBalance(balance);
 	}
 	
 	public void makeWithdrawal(int value) {
-		float balance = this.getAccountBalance() - value;
-		this.setAccountBalance(balance);
+		float balance = getAccountBalance() - value;
+		setAccountBalance(balance);
 	}
 	
 	public String getFirstName() {

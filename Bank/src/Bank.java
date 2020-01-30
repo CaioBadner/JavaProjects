@@ -5,7 +5,7 @@ public class Bank {
 	private String name, owner;
 	private double totalMoney;
 	private boolean isInsured;
-	List <Client> clientList = new ArrayList<Client>();
+	private List <Client> clientList = new ArrayList<Client>();
 	
 	public Bank(String name, String owner, boolean isInsured) {
 		this.name = name;

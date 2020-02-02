@@ -36,10 +36,8 @@ public class Brain {
 	//this will be the flag for the brain to start formulating educated guesses
 	private boolean knowsAllDigits;
 	
-	
-	
 	//this is a list of all possible guesses that will only be filled up if the brain decides that it makes sense to do it
-	private List <Integer> allPossibleGuesses = new ArrayList <Integer>();
+	private List <Integer> myGuesses = new ArrayList <Integer>();
 	
 	//and this is the main boolean array that will concentrate the definitive information that the brain has about the digits so far
 	//one row for each number(0-9) and one column for each position that the digit can occupy in the answer
@@ -110,19 +108,19 @@ public class Brain {
 		
 		//first we check all possible scenarios
 		//if no digits returned anything we eliminate them completely
-		if (table[round][3] + table[round][4] == 0) {		
+		if (table[round][length] + table[round][length + 1] == 0) {		
 			eliminateTheseDigits();
 		} 
 		//or if we should do a simple elimination of each digit in their position because we got no hits
-		else if (table[round][3] == 0) {		
+		else if (table[round][length] == 0) {		
 			eliminateDigitsFromCurrentPositions();
 		} 
 		//or if we got no nearHits, then eliminate everybody from every position except the ones they were in
-		else if (table[round][4] == 0) {
+		else if (table[round][length + 1] == 0) {
 			eliminateDigitsFromOtherPositions();
 		} 
 		//if we already know all digits because the sum of near hits and hits was equal to the length of the number
-		else if (table[round][3] + table[round][4] == length) {		
+		else if (table[round][length] + table[round][length + 1] == length) {		
 			eliminateEveryDigitExceptThese();
 		}
 		
@@ -149,7 +147,7 @@ public class Brain {
 		Random brainFart = new Random();
 		
 		int realGuess;
-		
+		boolean [] digitsAlreadyUsed = new boolean [10]; 
 		int digit = brainFart.nextInt(10);
 		boolean foundPlace = false;
 		int invertedGuess;
@@ -164,9 +162,10 @@ public class Brain {
 						digit = digit - 10;
 					}
 					
-					if (!eliminatedDigits[digit][i]) {
+					if (!eliminatedDigits[digit][i] && !digitsAlreadyUsed[digit]) {
 						invertedGuess = invertedGuess * 10 + digit;
 						foundPlace = true;
+						digitsAlreadyUsed[digit] = true;
 					} else { 
 						digit += (brainFart.nextInt(3) + 1);
 					} 
@@ -199,33 +198,37 @@ public class Brain {
 			
 			
 			
-		
+		setMyGuesses(realGuess);
 		return realGuess;
 	}
 
 
 
 
-	private boolean isGuessValid(int guess) {
-		if (!HitOrMissCaioBadner.isNumberValid(guess, length)) {
+	private boolean isGuessValid(int guess) 
+	{
+		/*if (!HitOrMissCaioBadner.isNumberValid(guess, length)) {
+			return false;
+		}*/
+		if (myGuesses.contains(guess)) 
+		{
+			System.out.println("I was thinking of " + guess + ", "
+					+ "but I just realized we tried this exact number on round " + (round + 1));
 			return false;
 		}
 		
 		int digit, counter = 0;
 		int guessCopy = guess;
 		
-		for (int i = 0; i <= round; i++) {
+		for (int i = 0; i <= round; i++) 
+		{
 			for (int j = 0; j < table[0].length - 2; j++) {
 				digit = guessCopy % 10;
 				if (digit == table[i][j]) {
 					counter++;
-					if (counter == length) {
-						//System.out.println("I was thinking of " + guess + ", "
-						//		+ "but I just realized we tried this exact number on round " + (round));
-						return false;
-					} else if (counter > (table[i][length] + table[i][length+1])) {
-						//System.out.println("I was thinking of " + guess + ", "
-						//		+ "but I just realized we tried something similar on round " + (round));
+					if (counter > (table[i][length] + table[i][length+1])) {
+						System.out.println("I was thinking of " + guess + ", "
+							+ "but I just realized we tried something similar on round " + (round + 1));
 						return false;
 					}
 				}
@@ -235,8 +238,6 @@ public class Brain {
 			guessCopy = guess;
 		}
 		
-		
-			
 		return true;
 	}
 
@@ -353,12 +354,12 @@ public class Brain {
 		this.gameHistory = gameHistory;
 	}
 
-	public List<Integer> getAllPossibleGuesses() {
-		return allPossibleGuesses;
+	public List<Integer> getMyGuesses() {
+		return myGuesses;
 	}
 
-	public void setAllPossibleGuesses(List<Integer> allPossibleGuesses) {
-		this.allPossibleGuesses = allPossibleGuesses;
+	public void setMyGuesses(int guess) {
+		this.myGuesses.add(guess);
 	}
 
 	public boolean[][] getEliminatedDigits() {

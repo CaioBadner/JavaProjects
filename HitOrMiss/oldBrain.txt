@@ -1,0 +1,157 @@
+//System.out.println("If I were you, I would guess " + callForHelp(tableOfResults));
+	
+	
+	/* THIS IS THE OLD BRAIN
+	
+	//This array creates a map of digits against true/false odds
+	// it has only been designed to solve a 4 digit number
+	//
+	// columns 0-3 symbolise the four digits' positions [3210] and column 4 is the general column
+	// a TRUE in any field means that the digit has been declared eliminated from that position
+	// 
+	// for example:     if brain[3][1] == true  
+	//                   then we know that the digit 3 cannot appear in position 1 xxXx  
+	//
+	// and the brain will learn that for example if 1st guess was 1234 and it came back with 0 hits
+	//
+	// if that guess had also 0 near hits, then brain[3][4] = true and now the digit 3 has been declared 
+	// eliminated altogether from the answer
+	
+	
+	 * 
+	
+	boolean [][] brain = new boolean [10][5];
+	
+	int educatedGuess = 1234;	
+	int counter = table[0][3];
+	int round = counter - 1;
+	 
+	
+	while (counter > 1) {
+		
+		//this is the situation where all four numbers are eliminated
+		if (table[round][1] == 0 && table[round][2] == 0) {
+			int num = table[round][0];
+			for (int i = 0; i < 4; i++) {
+				int digit = num % 10;
+				brain[digit][4] = true;
+				num = num / 10;
+			}
+		 
+		
+		//here we eliminate the number just in the position he came in the guess
+		} else if (table[round][1] == 0 && table[round][2] < 4) {
+			int num = table[round][0];
+			for (int i = 0; i < 4; i++) {
+				int digit = num % 10;
+				brain[digit][i] = true;
+				num = num / 10;
+			}
+		//this checks if this guess alone revealed all 4 digits	
+		} else if (table[round][1] + table[round][2] == 4) {
+			
+			int num = table[round][0];
+			byte d0 = (byte) (num % 10);
+			num = num/10;
+			byte d1 = (byte) (num % 10);
+			num = num/10;
+			byte d2 = (byte) (num % 10);
+			num = num/10;
+			byte d3 = (byte) (num % 10);
+			brain[d0][4] = true;
+			brain[d1][4] = true;
+			brain[d2][4] = true;
+			brain[d3][4] = true;
+			
+			for (int i = 0; i < 10; i++) {
+				if (brain[i][4]) {
+					brain[i][4] = false;
+				} else {
+					brain[i][4] = true;
+				}
+			
+			}
+			
+			//and this checks if the two first guesses combined revealed all 4 digits	
+		} /*else if (table[round][1] + table[round][2] + table[round-1][1] + table[round-1][2]  == 4) {
+			
+			int num = table[round][0];
+			byte d0 = (byte) (num % 10);
+			byte d1 = (byte) (num % 10);
+			byte d2 = (byte) (num % 10);
+			byte d3 = (byte) (num % 10);
+			int num2 = table[round-1][0];
+			byte d4 = (byte) (num2 % 10);
+			byte d5 = (byte) (num2 % 10);
+			byte d6 = (byte) (num2 % 10);
+			byte d7 = (byte) (num2 % 10); 
+			
+			brain[d0][4] = true;
+			brain[d1][4] = true;
+			brain[d2][4] = true;
+			brain[d3][4] = true;
+			brain[d4][4] = true;
+			brain[d5][4] = true;
+			brain[d6][4] = true;
+			brain[d7][4] = true; 
+			
+			for (int i = 0; i < 10; i++) {
+				if (brain[i][4]) {
+					brain[i][4] = false;
+				} else {
+					brain[i][4] = true;
+				}
+			
+			}
+			
+		}
+		
+		
+		
+		
+		
+			//educatedGuess = 9123;
+			//educatedGuess = 5678;
+			//return educatedGuess;
+			
+		
+		
+		counter --;
+		round --;
+	}
+	
+		
+			
+			//this is the first complex check, we see if the first answer was decisive enough
+		
+		
+		
+		
+	return educatedGuess;
+	}
+
+
+
+
+
+
+}
+*/
+
+/*
+private static boolean[][] readTable(int[][] table) {
+	
+	boolean [][] brain = new boolean [10][5];
+	int round = table[0][3];
+	
+	
+		while (round >= 0) {
+			int num = table[round][0];
+			while (num > 0) {
+				int digit = num % 10;
+	//			if ((table[round][1] + )
+			}
+		}
+	return brain;
+}
+*/

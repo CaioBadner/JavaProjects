@@ -4,10 +4,7 @@ import java.util.Random;
 
 public class Brain {
 
-	//these are the emotional variables - they are all naturally false
-	private boolean isThinking, isHappy, isHungry, isConfident, isInterested;
-	
-	//this is how the brain keeps track of the results
+		//this is how the brain keeps track of the results
 	//the number will be sorted aligning the digits positions to their cells 
 	//so for example, if the UserGuess was 123, then the number will be stored in this array like that
 	//  
@@ -23,21 +20,8 @@ public class Brain {
 	//and this for him to have quick access to the length of the number 
 	private int length;
 	
-	//this is where the brain keeps the history of past games to keep track of his form
-	private List <int [][]> gameHistory = new ArrayList <int[][]>();
-	
-	
-	//this is a simple football inspired 'form' stat which will be filled with nothing but characters
-	//and it will be a quick register of the last 5 games, in this format: W is a win, and L is a loss
-	//so an example of this string, after 5 games could be - WLLWW - which means that the brain won the last two games
-	//lost the two games before that and won the game that happened before that;
-	private String currentForm;
-	
-	//this will be the flag for the brain to start formulating educated guesses
-	private boolean knowsAllDigits;
-	
-	//this is a list of all possible guesses that will only be filled up if the brain decides that it makes sense to do it
-	private List <Integer> myGuesses = new ArrayList <Integer>();
+	//this is a list of all possible guesses that will only be filled up if there are less than 50 guesses left
+	private List <Integer> eliminatedGuesses;
 	
 	//and this is the main boolean array that will concentrate the definitive information that the brain has about the digits so far
 	//one row for each number(0-9) and one column for each position that the digit can occupy in the answer
@@ -50,7 +34,18 @@ public class Brain {
 	//this is a quick calculation of how many possible guesses are possible in total, and how many are left after the elimination 
 	private int possibleGuesses;
 	
+	//and this is the mini guess list that he will prepare when there are a few options left
+	private List <Integer> miniList;
 	
+	//this is where the brain will keep the history of past games to keep track of his form
+	//private List <int [][]> gameHistory = new ArrayList <int[][]>();
+		
+		
+	//this is a simple football inspired 'form' stat which will be filled with nothing but characters
+	//and it will be a quick register of the last 5 games, in this format: W is a win, and L is a loss
+	//so an example of this string, after 5 games could be - WLLWW - which means that the brain won the last two games
+	//lost the two games before that and won the game that happened before that;
+	//private String currentForm;
 	
 	
 	public Brain(int length, int maxAmountOfGuesses) {
@@ -61,14 +56,16 @@ public class Brain {
 		this.table = new int [maxAmountOfGuesses][length + 2];
 		
 		//and then we make the boolean array according to the length of the number we're dealing with
-		this.eliminatedDigits = new boolean [10][length+1];
+		this.eliminatedDigits = new boolean [10][length];
 		
 		//here we set the only special rule of this game, no number can ever start with the digit 0
 		this.eliminatedDigits[0][length-1] = true;
 		
-		//and here we just keep track of how many digits  been eliminated from each position
+		//and here we just keep track of how many digits have been eliminated from each position
 		//this basically will be just a sum of all fields from the previous array to make the brain's life easier
-		this.possibleDigitsSum = new int [length+1];
+		this.possibleDigitsSum = new int [length];
+		
+		this.eliminatedGuesses = new ArrayList <Integer>();
 		
 	}
 	
@@ -79,9 +76,13 @@ public class Brain {
 		this.round = round;
 		
 		int width = this.table[0].length;
-					
+		
+		//here we add the current guess to the list of wrong guesses
+		eliminatedGuesses.add(guess);
+
 		//this is the small loop that will break down the number in the first cells of the array
 			for (int y = 0; y < width; y++) {
+				
 				if (y < width - 2) {
 				int digit = guess % 10;
 				this.table[round][y] = digit;
@@ -100,7 +101,7 @@ public class Brain {
 		//updating the table will set off a chain of events to make all the calculations and formulate a guess
 		//so first thing we do is read the results and think of our course of action
 		readResults();	
-		}
+	}
 	
 	
 
@@ -124,119 +125,216 @@ public class Brain {
 			eliminateEveryDigitExceptThese();
 		}
 		
+		possibleGuesses = getPossibleGuesses();	
 		
-		
-		possibleGuesses = getPossibleGuesses();
-		System.out.println("There are " + possibleGuesses + " possible guesses at this point in the game");
+		//System.out.println("There are still " + possibleGuesses + " possible guesses at this point in the game");
 			//here is just a quick update of the sum of the eliminated digits
 		
 		
-		//if (getTotalPossibleGuesses() < 100) {
-		//	generateEducatedGuess();
-		//} else {
-			System.out.println("If I were you, I would guess " + generateValidGuess());
-		//}
-		
+		//here he decides whether to keep on guessing or to make a list of possible guesses
+		if (possibleGuesses > 24) {
+			System.out.println("\nIf I were you, I would guess " + generateValidGuess());
+		} else {
+			//if the list is empty then we generate a list
+			if (miniList == null) {
+				this.miniList = generateMiniList();
+			}
+			System.out.println("\nIf I were you, I would guess " + chooseGuessFromMiniList());
+		}
 	}
 
 	
-
-
-
-	private int generateValidGuess() {
-		Random brainFart = new Random();
+	private int chooseGuessFromMiniList() {
 		
-		int realGuess;
-		boolean [] digitsAlreadyUsed = new boolean [10]; 
-		int digit = brainFart.nextInt(10);
-		boolean foundPlace = false;
-		int invertedGuess;
-		do {
+		if (miniList.size() == 0) {
+			System.out.println("I am sorry, I am out of ideas... You are on your own now, good luck!");
+			return 0;
+		}
+		
+			int guess = miniList.get(0);
+			miniList.remove(0);
+			eliminatedGuesses.add(guess);
+		
+		return guess;
+		
+	}	
+	
+	
+	//this will go down the eliminated digits table and generate every possible guess that 
+	//is still valid, it will only run when the Brain is really close to the answer
+	//this method can only run once per game
+	private List <Integer> generateMiniList() {
+		
+		List <Integer> miniList = new ArrayList <Integer>();
+		
+		String strGuess = "";
+		int guess; 
+		int pos;
+					
+
+
+		for (int j = 0; j < eliminatedDigits.length; j++) {
+			pos = 0;
 			
-			invertedGuess = 0;
-			
-			for (int i = 0; i < eliminatedDigits[0].length - 1; i++) {
-				while (!foundPlace) {
-					
-					if (digit > 9) {
-						digit = digit - 10;
-					}
-					
-					if (!eliminatedDigits[digit][i] && !digitsAlreadyUsed[digit]) {
-						invertedGuess = invertedGuess * 10 + digit;
-						foundPlace = true;
-						digitsAlreadyUsed[digit] = true;
-					} else { 
-						digit += (brainFart.nextInt(3) + 1);
-					} 
-					
-				}
+			if (!eliminatedDigits[j][pos]) {
 				
-				foundPlace = false;
-				digit += (brainFart.nextInt(3) + 1);
-			}
-			
-			realGuess = 0;
-			
-			while (invertedGuess != 0) {
-				digit = invertedGuess % 10;
-				realGuess = realGuess * 10 + digit;
-				invertedGuess /= 10;
-			}
-			
-			if (realGuess < 100) {
-				realGuess = realGuess * 10;
-			}
+				for (int k = 0; k < eliminatedDigits.length; k++) {
+					pos = 1;
+					
+					if (!eliminatedDigits[k][pos] && k != j) {
+						
+						for (int l = 1; l < eliminatedDigits.length; l++) {
+							pos = 2;
+							
+							if (!eliminatedDigits[l][pos] && k != l && j != l) {
+								
+								strGuess = "" + l + k + j;
+								guess = Integer.parseInt(strGuess);
+								if (isGuessLogical(guess)) {
+									miniList.add(guess);	
+								} 
+								
+							}
+						}
+					}
+				}
+		}
+				
+				}
 		
-		} while (!isGuessValid(realGuess));
+		return miniList;
 		
-		
-		
-		//this will generate the appropriate guess but inverted
-		
-			//and before we send it, we need to reverse back to the brain's order [0][1][2]
-			
-			
-			
-		setMyGuesses(realGuess);
-		return realGuess;
 	}
 
 
 
+	//this is the basic function that will be used to throw numbers in the beginning of the game
+	//it will return guesses that will be checked against the eliminatedDigits table and the past results
+	public int generateValidGuess() {
 
-	private boolean isGuessValid(int guess) 
-	{
-		/*if (!HitOrMissCaioBadner.isNumberValid(guess, length)) {
-			return false;
-		}*/
-		if (myGuesses.contains(guess)) 
-		{
-			System.out.println("I was thinking of " + guess + ", "
-					+ "but I just realized we tried this exact number on round " + (round + 1));
-			return false;
-		}
+		int realGuess;
+		String strGuess;
 		
-		int digit, counter = 0;
-		int guessCopy = guess;
+		//this is to keep track of the random loops
+		int counter = 0;
 		
-		for (int i = 0; i <= round; i++) 
-		{
-			for (int j = 0; j < table[0].length - 2; j++) {
-				digit = guessCopy % 10;
-				if (digit == table[i][j]) {
-					counter++;
-					if (counter > (table[i][length] + table[i][length+1])) {
-						System.out.println("I was thinking of " + guess + ", "
-							+ "but I just realized we tried something similar on round " + (round + 1));
-						return false;
+		
+		//here we ask for our random digits, after they were validated
+		int digit;
+
+				
+		do {
+			
+			//this will keep track of which digits already have been used to make 
+			//sure we get a valid guess with no repeating digits
+			//basically this is how we teach the Brain about the rules of the game 
+			boolean [] digitsAlreadyUsed = new boolean [10]; 
+			
+			strGuess = "";
+			for (int i = 0; i < length; i++) {
+				digit = getValidDigit(digitsAlreadyUsed, i, counter++);
+				strGuess = digit + strGuess;
+				digitsAlreadyUsed[digit] = true;
+			}
+			
+			realGuess = Integer.parseInt(strGuess);
+			
+			
+			//and we are going to take as many rounds here as necessary in this last check, 
+			//otherwise the guess would be wrong and the brain would be hurting the player
+			//so the brain doesn't mind even if he has to repeat this a million times
+		} while (!isGuessLogical(realGuess));
+		
+		return realGuess;
+	}
+
+	//and this is the counterpoint to the previous function, this is the random function that gives digits back to the other one
+	private int getValidDigit(boolean digitsAlreadyUsed[], int position, int counter) {
+		
+		Random brainFart = new Random();
+		int digit = brainFart.nextInt(10);
+		boolean foundDigit = false;
+		
+		//here we ask if this digit is already eliminated and if we have already used it in this answer
+		while (!foundDigit) {
+			if (eliminatedDigits[digit][position] == false && !digitsAlreadyUsed[digit]) {
+				foundDigit = true;
+			} else {
+				
+				
+				//if the number is not valid, we tell him to go one up until he finds it. 
+				// then next time he will go one down to make sure he won't get stuck getting the same digits
+				if (counter % 2 == 0) {
+					digit -= 1;
+					if (digit < 0) {
+						digit = 9;
+					}
+				} else {
+					digit += 1;
+					if (digit > 9) {
+						digit = 0;
 					}
 				}
-				guessCopy = guessCopy / 10;
+				
 			}
-			counter = 0;
+		}
+		return digit;
+	}
+	
+	//here we go down the table and double check this guess against all the other past guesses
+	//to see if it makes sense to try this guess, 
+	//even though it is valid and all its digits are in possible positions
+	private boolean isGuessLogical(int guess) {
+		
+		if (eliminatedGuesses.contains(guess)) {
+			return false;
+		}
+		
+		int digit, hitsCounter = 0, nearHitsCounter = 0;
+		int guessCopy = guess;
+		
+		
+		
+		// the main loop will run all the previous rounds, from round 1 to the current
+		for (int i = 0; i <= round; i++) {
+			
+		
+			//this will do one loop for each digit of the guess
+			// so J is the position of the digit in the guess
+			for (int j = 0; j < length; j++) {
+				digit = guessCopy % 10;
+				
+				//and it will run against each digit of the previous guesses
+				// here K is the position of the digits in the previous guesses
+				for (int k = 0; k < length; k++) {
+					
+					//here we ask if this digit appeared in the guess
+					if (digit == table[i][k]) {
+						//and we add to the appropriate counter
+						if (k == j) {
+							hitsCounter++;
+						} else {
+							nearHitsCounter++;
+						}
+						//here we need this break to avoid double results
+						break;
+					}
+				}
+				
+				if (hitsCounter > table[i][length] || nearHitsCounter > table[i][length+1]) {
+					//System.out.println("\nI was thinking of " + guess + ", "
+					//	+ "but I just realized we tried something similar on round " + (i+1));
+					eliminatedGuesses.add(guess);
+					return false;
+				}
+				guessCopy = guessCopy / 10;	
+					
+		}
+			hitsCounter = 0;
+			nearHitsCounter = 0;
 			guessCopy = guess;
 		}
+			
 		
 		return true;
 	}
@@ -249,9 +347,9 @@ public class Brain {
 		
 		for (int i = 0; i < length; i++) {
 			digit = table[round][i];
-			for (int j = 0; j < eliminatedDigits[0].length - 1; j++) {
+			for (int j = 0; j < eliminatedDigits[0].length; j++) {
 				if (i != j) {
-						eliminatedDigits[digit][j] = true;
+					eliminatedDigits[digit][j] = true;
 				}
 			}
 		}
@@ -280,48 +378,42 @@ public class Brain {
 			}
 			
 		}
+		
 	}
+	
+	
 	
 	private void eliminateEveryDigitExceptThese() {
 		
-		//int digit;
+			int counter = 0; 
 			
 			for (int i = 0; i < 10; i++) {
-				if (i != table[round][0] && i != table[round][1] && i != table[round][2]) {
-					for (int j = 0; j < eliminatedDigits[0].length; j++) {
-						eliminatedDigits[i][j] = true;
+				for (int j = 0; j < length; j++) {
+					if (i != table[round][j]) {
+						counter++;
 					}
 				}
+				if (counter == length) {
+					for (int k = 0; k < length; k++) {
+						eliminatedDigits[i][k] = true;
+					}
+					
+				}
+				counter = 0;
 			}
 	
 	}
 
-	public boolean doesItKnowAllDigits() {
-		return knowsAllDigits;
-	}
-
-
-
-	public void setKnowsAllDigits(boolean knowsAllDigits) {
-		this.knowsAllDigits = knowsAllDigits;
-	}
-
-
-
+	
 	public int[] getPossibleDigitsSum() {
 		return possibleDigitsSum;
 	}
 
 
-
-	
-		
-	
 	public int getPossibleGuesses() {
 		
-		possibleGuesses = 0;
-		
-		for (int i = 0; i < eliminatedDigits[0].length - 1; i++) {
+		//first we prepare the sum of the possible digits left
+		for (int i = 0; i < eliminatedDigits[0].length; i++) {
 			possibleDigitsSum[i] = 0;
 			for (int j = 0; j < eliminatedDigits.length; j++) {
 				if (eliminatedDigits[j][i] == false) {
@@ -331,8 +423,8 @@ public class Brain {
 		}
 		
 		int possibleGuesses = 1;
-		
-		for (int i = 0; i < possibleDigitsSum.length - 1; i++) {
+		//and here we just multiply every field and get the total number of guesses still possible
+		for (int i = 0; i < possibleDigitsSum.length; i++) {
 			possibleGuesses *= possibleDigitsSum[i];
 		}
 		
@@ -346,22 +438,12 @@ public class Brain {
 	}
 
 
-	public List<int[][]> getGameHistory() {
-		return gameHistory;
-	}
 
-	public void setGameHistory(List<int[][]> gameHistory) {
-		this.gameHistory = gameHistory;
-	}
 
-	public List<Integer> getMyGuesses() {
-		return myGuesses;
+	public List <Integer> getEliminatedGuesses() {
+		return eliminatedGuesses;
 	}
-
-	public void setMyGuesses(int guess) {
-		this.myGuesses.add(guess);
-	}
-
+	
 	public boolean[][] getEliminatedDigits() {
 		return eliminatedDigits;
 	}
@@ -370,59 +452,38 @@ public class Brain {
 		this.eliminatedDigits = eliminatedDigits;
 	}
 
+	
+	//here are the history variables for future implementation
+	/*
 	public String getCurrentForm() {
 		return currentForm;
 	}
 
-	public void setCurrentForm(String currentForm) {
-		this.currentForm = currentForm;
+	public void updateCurrentForm(char result) {
+		
+		if (currentForm.length() == 5) {
+			currentForm = "" + currentForm.charAt(1) + currentForm.charAt(2) + currentForm.charAt(3) + currentForm.charAt(4); 
+		}
+		
+		currentForm = currentForm + result;
 	}
 	
+	public List<int[][]> getGameHistory() {
+		return gameHistory;
+	}
 	
-	//here are the emotional variables
-	public boolean isThinking() {
-		return isThinking;
+	public int[][] getGameHistory(int round) {
+		return gameHistory.get(round);
 	}
 
-	public void setThinking(boolean isThinking) {
-		this.isThinking = isThinking;
+	public void addToGameHistory(int[][] table) {
+		gameHistory.add(table);
 	}
+	*/
+	
+	
 
-	public boolean isHappy() {
-		return isHappy;
-	}
 
-	public void setHappy(boolean isHappy) {
-		this.isHappy = isHappy;
-	}
-
-	public boolean isHungry() {
-		return isHungry;
-	}
-
-	public void setHungry(boolean isHungry) {
-		this.isHungry = isHungry;
-	}
-
-	public boolean isConfident() {
-		return isConfident;
-	}
-
-	public void setConfident(boolean isConfident) {
-		this.isConfident = isConfident;
-	}
-
-	public boolean isInterested() {
-		return isInterested;
-	}
-
-	public void setInterested(boolean isInterested) {
-		this.isInterested = isInterested;
-	}
-
-	public int getRound() {
-		return round;
-	}
 
 
 	

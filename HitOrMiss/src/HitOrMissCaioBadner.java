@@ -17,11 +17,9 @@ public class HitOrMissCaioBadner {
 		//then be asked if he wants to play again in the same difficulty
 		do {
 			
-		
-		int[] [] tableOfResults = new int[maxAmountOfGuesses+1][3];
-		
 		//here we define the most important variable of the game, 
 		//this number cannot be larger than 9
+			//brain only works with 3 so far
 		int numberLength = 3;
 		
 		int compNumber = generateValidComputerNumber(numberLength);
@@ -48,11 +46,9 @@ public class HitOrMissCaioBadner {
 			//here we update the table of results, like the newest edition of a newspaper
 			//tableOfResults[0][n] is a row that for now is empty but in the future it will be the place where the results are written
 			if (currentRound > 1) {
-			tableOfResults[currentRound-2][0] = userGuess;
-			tableOfResults[currentRound-2][1] = amountOfHits;
-			tableOfResults[currentRound-2][2] = amountOfNearHits;
-							
-			wilson.setTable(currentRound - 2, userGuess,amountOfHits,amountOfNearHits);
+				wilson.setTable(currentRound - 2, userGuess,amountOfHits,amountOfNearHits);
+			} else {
+				System.out.println("If I were you, I would guess 123");
 			}
 			
 			userGuess = getValidUserGuess(numberLength);
@@ -62,17 +58,18 @@ public class HitOrMissCaioBadner {
 			amountOfNearHits = results[1];
 			
 			if (amountOfHits == numberLength) {
-				System.out.println("Round " + currentRound + " | Your Guess: " + userGuess + " | Hits: " 
+				System.out.println("\nRound " + currentRound + " | Your Guess: " + userGuess + " | Hits: " 
 						+ amountOfHits + " | Near Hits: " + amountOfNearHits + " | Rounds left: " 
 						+ (maxAmountOfGuesses - currentRound));
 				isUserWon = true;
 			}
 			else {
-				System.out.println("Round " + currentRound + " | Your Guess: " + userGuess + " | Hits: " 
+				System.out.println("\nRound " + currentRound + " | Your Guess: " + userGuess + " | Hits: " 
 						+ amountOfHits + " | Near Hits: " + amountOfNearHits + " | Rounds left: " 
 						+ (maxAmountOfGuesses - currentRound));
 				currentRound++;
 			}
+			
 			
 		
 		}

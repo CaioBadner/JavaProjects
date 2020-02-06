@@ -160,8 +160,7 @@ public class HitOrMissCaioBadner {
 		
 		int userGuess = 0;
 		String strUserGuess;
-		int counter = 0;
-		
+				
 		while(!isNumberValid(userGuess, length)) {
 		
 			try {

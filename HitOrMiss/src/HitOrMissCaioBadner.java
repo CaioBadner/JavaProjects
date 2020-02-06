@@ -3,15 +3,26 @@ import java.util.Random;
 import javax.swing.JOptionPane;
 
 public class HitOrMissCaioBadner {
+	
+	public final static String title = "GuessingGame 2.0";
+	
+	//this will keep track of the mistakes in the input to make fun of the player
+	public static int mistakeCounter;
 
 	public static void main(String[] args) {
 		
 		JOptionPane.showMessageDialog(null, "\n" + "\n         GuessingGame 2.0               \n  "
 										  + "\n ","GuessingGame 2.0", 3);
 		
-		final String title = "GuessingGame 2.0";
+		
 		int difficultyLevel = getValidDifficultyLevel();
+		String [] diffText = {"Caio Badner","EASY","MEDIUM","HARD"};
 		int maxAmountOfGuesses = getAmountOfGuessesByDifficultyLevel(difficultyLevel);
+		
+		//here we keep the overall score of player[0] vs computer[1] 
+		// and the current best for each [2] [3]
+		int [] score = new int [4];
+		
 		
 		//this is the main loop of the game, he will get one full round and 
 		//then be asked if he wants to play again in the same difficulty
@@ -77,19 +88,28 @@ public class HitOrMissCaioBadner {
 		System.out.println("");
 		
 		if (isUserWon) {
-			System.out.println("Guess nº" + currentRound + " (" + userGuess + ") was correct.");
+			System.out.println("Guess n." + currentRound + " (" + userGuess + ") was correct.");
 			JOptionPane.showMessageDialog(null, "Nice! You got it right!! My number was " + compNumber,	
 																							title, 2);
 			if (currentRound == 1) {
 				JOptionPane.showConfirmDialog(null, "Did you cheat?", title, 0);
 			}
+			
+			score[0]++;
 		}
 		else {
 			System.out.println("You have no more guesses. The answer was " + compNumber);
 			JOptionPane.showMessageDialog(null, "It's ok, try an easier level next time... My number was " 
 												+ compNumber, title, 0);
+			score[1]++;
 		}
-	
+		
+		JOptionPane.showMessageDialog(null, "       ---------------      " + diffText[difficultyLevel] + "       ---------------      " 
+											+ "\n" + "\n" + "The score is      " + "\n" + "\n" + 
+											"Computer                                                " + score[1] + "\n" + 
+											"Player and his Brain                              " + score[0] + "\n" 
+											+ "\n                                       -                                   ", title, 0);
+		
 		} while (JOptionPane.showConfirmDialog(null, "Wanna play again?", title,JOptionPane.YES_NO_OPTION) == 0);
 	}
 
@@ -138,18 +158,28 @@ public class HitOrMissCaioBadner {
 	
 	private static int getValidUserGuess(int length) {
 		
-		String USER_TEXT = "Please enter a " + length + " digit number with no repeating digits";
-		
-		String strUserGuess = JOptionPane.showInputDialog(null,USER_TEXT,"GuessingGame 2.0", 1);
-		
-		int userGuess = Integer.parseInt(strUserGuess);
+		int userGuess = 0;
+		String strUserGuess;
+		int counter = 0;
 		
 		while(!isNumberValid(userGuess, length)) {
-			strUserGuess = JOptionPane.showInputDialog(null,"Invalid number. " 
-															+ USER_TEXT,"GuessingGame 2.0", 0);
-			userGuess = Integer.parseInt(strUserGuess);
-		}
 		
+			try {
+				
+				strUserGuess = JOptionPane.showInputDialog(null,"Please enter a " + length + " digit number with no repeating digits",title, 1);
+				userGuess = Integer.parseInt(strUserGuess); 
+			
+			} catch (NumberFormatException ex) {
+				JOptionPane.showMessageDialog(null, "Invalid guess!", title,1);
+				mistakeCounter++;
+				if (mistakeCounter % 5 == 0) {
+					JOptionPane.showMessageDialog(null, "What are you, stupid?", title,3);
+				} else if (mistakeCounter % 17 == 0) {
+					JOptionPane.showMessageDialog(null, "Fucking hell!", title,3);
+				}
+			}
+			
+		}
 		return userGuess;
 	}
 
@@ -230,15 +260,25 @@ public class HitOrMissCaioBadner {
 							"2.Medium - 9 guesses\n"+
 							"3.Hard - 7 guesses";
 		
-		String strDifficultyLevel = JOptionPane.showInputDialog(null,DIFF_TEXT,"GuessingGame 2.0", 1);
 		
-		int difficultyLevel = Integer.parseInt(strDifficultyLevel);
 		
-		while(difficultyLevel<1 || difficultyLevel>3) {
-			strDifficultyLevel = JOptionPane.showInputDialog(null,"Invalid number, it should be 1-3\n"
-					+ DIFF_TEXT,"GuessingGame 2.0", 0);
-			difficultyLevel = Integer.parseInt(strDifficultyLevel);
-		}
+			int difficultyLevel;
+		
+		
+			try {
+				String strDifficultyLevel = JOptionPane.showInputDialog(null,DIFF_TEXT,title, 1);
+				difficultyLevel = Integer.parseInt(strDifficultyLevel);
+			} catch(NumberFormatException ex) { 
+				JOptionPane.showMessageDialog(null, "What? Ok, let's play it easy :)", title, 0);
+				mistakeCounter++;
+				difficultyLevel = 1;
+			}
+
+			if (difficultyLevel<1 || difficultyLevel>3) {
+				JOptionPane.showMessageDialog(null, "What number was that? I said 1-3... Ok, let's play it easy :)", title, 0);
+				mistakeCounter++;
+				difficultyLevel = 1;
+			}
 		
 		return difficultyLevel;
 	}

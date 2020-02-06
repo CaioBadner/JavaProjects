@@ -77,7 +77,7 @@ public class Brain {
 		
 		int width = this.table[0].length;
 		
-		//here we add the current guess to the list of wrong guesses
+		//here we add the last guess to the list of wrong guesses
 		eliminatedGuesses.add(guess);
 
 		//this is the small loop that will break down the number in the first cells of the array
@@ -132,29 +132,39 @@ public class Brain {
 		
 		
 		//here he decides whether to keep on guessing or to make a list of possible guesses
-		if (possibleGuesses > 24) {
+		if (possibleGuesses > 45) {
 			System.out.println("\nIf I were you, I would guess " + generateValidGuess());
 		} else {
 			//if the list is empty then we generate a list
 			if (miniList == null) {
 				this.miniList = generateMiniList();
+			} else {
+				updateMiniList();
 			}
 			System.out.println("\nIf I were you, I would guess " + chooseGuessFromMiniList());
 		}
 	}
 
 	
+	private void updateMiniList() {
+		for (int i = 0; i < miniList.size(); i++) {
+			if (!isGuessLogical(miniList.get(i))) {
+				miniList.remove(i);
+			}
+		}
+	}
+
+
+
 	private int chooseGuessFromMiniList() {
 		
 		if (miniList.size() == 0) {
 			System.out.println("I am sorry, I am out of ideas... You are on your own now, good luck!");
-			return 0;
+			return 123;
 		}
 		
 			int guess = miniList.get(0);
-			miniList.remove(0);
-			eliminatedGuesses.add(guess);
-		
+			
 		return guess;
 		
 	}	

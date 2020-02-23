@@ -22,12 +22,12 @@ public class Printer {
 		
 		System.out.print("    ");
 		for (int y = 0; y < board.getSize(); y++) {
-		System.out.print(COLUMN + y);
+		System.out.print(COLUMN + (y + 1));
 		}
 		System.out.print(COLUMN + "\n" + ROW + "\n");
 				
 		for (int x = 0; x < board.getSize(); x++) {
-			System.out.print(COLUMN + x);
+			System.out.print(COLUMN + (x + 1));
 			
 			for (int y = 0; y < board.getSize(); y++) {
 				System.out.print(COLUMN + board.getTile(x, y));

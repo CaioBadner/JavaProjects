@@ -15,7 +15,9 @@ public class Player {
 	private static final int[][] CORNERS = {{0,0},{0,2},{2,0},{2,2}};
 	private static final int[][] MIDDLES = {{1,0},{0,1},{1,2},{2,1}};
 	private static final int[] CENTER = {1,1};
-		
+	private static final int[][] DIAGONALONE = {{0,0},{1,1},{2,2}};
+	private static final int[][] DIAGONALTWO = {{2,0},{1,1},{0,2}};
+	
 	//human players get identified by their construction with a name
 	public Player (char team, String name) {
 	
@@ -80,8 +82,8 @@ public class Player {
 				 playerMove = getComputerMove(board);
 			} while (!isMoveValid(playerMove, board));
 				
-			JOptionPane.showMessageDialog(null, "I will place a " + this.playerTeam + " at (" + playerMove.getX() 
-										+ "," + playerMove.getY() + ")", this.playerName, 1 );	
+			JOptionPane.showMessageDialog(null, "I will place a " + this.playerTeam + " at (" + (playerMove.getX()+1) 
+										+ "," + (playerMove.getY()+1) + ")", this.playerName, 1 );	
 			return playerMove;
 		}
 	}
@@ -99,20 +101,17 @@ public class Player {
 		}
 		
 		do { 
-			
 			input = JOptionPane.showInputDialog(null, this.playerName + ", enter a " + strCoord 
-					+ " number from 0 to 2", this.playerTeam + " to move", 3);
+					+ " number from 1 to 3", this.playerTeam + " to move", 3);
 			try {
 				coord = Integer.parseInt(input);
 			} catch (NumberFormatException ex) {
 				JOptionPane.showMessageDialog(null, "Please enter a valid " + strCoord 
-						+ " number! 0-1-2", "Error", 0);
+						+ " number! 1-2-3", "Error", 0);
 				continue;
 			}
-			
-		} while (coord < 0 || coord > 2);
-		
-		return coord;
+		} while (coord < 1 || coord > 3);
+		return coord - 1;
 	}
 
 	private boolean isMoveValid(Move move, Board board) {
@@ -123,7 +122,7 @@ public class Player {
 		}
 		
 		if (!this.isRobot) {
-			JOptionPane.showMessageDialog(null, "The square (" + move.getX() + "," + move.getY() 
+			JOptionPane.showMessageDialog(null, "The square (" + (move.getX()+1) + "," + (move.getY()+1) 
 										+ ") is occupied!" + "\nPlease enter a valid a move!", "Error", 0);
 		}	
 		return false;
@@ -214,7 +213,7 @@ public class Player {
 			}
 		} else {
 			//here there is a 40% chance it will go for a corner if the opponent didnt chose the middle
-			if (option > 3) {
+			if (option > 2) {
 				for (int [] i  : CORNERS) {
 					if (board.getTile(i[0], i[1]) == 0) {
 						return new Move(i[0],i[1],this.playerTeam);
@@ -268,17 +267,16 @@ public class Player {
 		}	
 		
 		//then the diagonals
-	
-		for (int x = 2; x > 0; x--) {
-			int moveX = 0;
-			int moveY = 0;
-			int counter = 0;
-			for (int y = 0; y < board.getSize(); y++) {
-				if (board.getTile(x, y) == team) {
+		int moveX = 0;
+		int moveY = 0;
+		int counter = 0;
+		for (int [] i : DIAGONALONE) {
+			counter = 0;
+				if (board.getTile(i[0],i[1]) == team) {
 					counter++;
-				} else if (board.getTile(x, y) == 0) {
-					moveX = x;
-					moveY = y;
+				} else if (board.getTile(i[0],i[1]) == 0) {
+					moveX = i[0];
+					moveY = i[1];
 				} else {
 					counter--;
 				}
@@ -286,24 +284,22 @@ public class Player {
 			if (counter == 2) {
 				return new Move(moveX, moveY, this.playerTeam);
 			}
-		}	
-		
-		int moveX = 0;
-		int moveY = 0;
-		int counter = 0;
-		for (int x = 0; x < board.getSize(); x++) {
-			if (board.getTile(x, x) == team) {
+	
+		for (int [] i : DIAGONALTWO) {
+			counter = 0;
+			if (board.getTile(i[0],i[1]) == team) {
 				counter++;
-			} else if (board.getTile(x, x) == 0) {
-				moveX = x;
-				moveY = x;
-			} else { 
+			} else if (board.getTile(i[0],i[1]) == 0) {
+				moveX = i[0];
+				moveY = i[1];
+			} else {
 				counter--;
 			}
 		}
 		if (counter == 2) {
 			return new Move(moveX, moveY, this.playerTeam);
 		}
+	
 		
 		//if nothing useful has been found he will return an empty move and use 
 		//that information to make the next decision
@@ -314,10 +310,11 @@ public class Player {
 	
 	public boolean didPlayerWin(Board board) {
 		
-		int counter = 0;
+		
 		
 		//first we check the rows
 		for (int x = 0; x < board.getSize(); x++) {
+			int counter = 0;
 			for (int y = 0; y < board.getSize(); y++) {
 				if (board.getTile(x, y) == this.playerTeam) {
 					counter++;
@@ -326,11 +323,11 @@ public class Player {
 			if (counter == board.getSize()) {
 				return true;
 			}
-			counter = 0;
 		}
 		
 		//then we check the columns
 		for (int y = 0; y < board.getSize(); y++) {
+			int counter = 0;
 			for (int x = 0; x < board.getSize(); x++) {
 				if (board.getTile(x, y) == this.playerTeam) {
 					counter++;
@@ -339,7 +336,6 @@ public class Player {
 			if (counter == board.getSize()) {
 				return true;
 			}
-			counter = 0;
 		}
 		
 		//and this checks both of the diagonals

@@ -85,12 +85,15 @@ public class JogoDaVelhaMain {
 	private static Player getNewPlayer() {
 		Player player;
 		
-		String firstPlayerName = JOptionPane.showInputDialog(null, "What is your name?", TITLE, 3);
+		String playerName = "";
+		while (playerName == null || playerName.length() < 1) {
+		playerName = JOptionPane.showInputDialog(null, "What is your name?", TITLE, 3);
+		} 
 		
 		if (JOptionPane.showConfirmDialog(null, "Do you want to be the Xs?", TITLE, JOptionPane.YES_NO_OPTION) == 0) {
-			player = new Player('X', firstPlayerName);
+			player = new Player('X', playerName);
 		} else {
-			player = new Player('O', firstPlayerName);
+			player = new Player('O', playerName);
 		}
 		return player;
 	}
@@ -102,7 +105,12 @@ public class JogoDaVelhaMain {
 		if (oppositeTeam == 'O') {
 			newTeam = 'X';
 		}
-		String playerName = JOptionPane.showInputDialog(null, "What is your friend's name?", TITLE, 3);
+		
+		String playerName = "";
+		while (playerName == null || playerName.length() < 1) {
+			playerName = JOptionPane.showInputDialog(null, "What is your friend's name?", TITLE, 3);
+		}
+		
 		player = new Player(newTeam, playerName);
 		return player;
 	}

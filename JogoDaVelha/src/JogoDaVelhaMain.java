@@ -90,6 +90,10 @@ public class JogoDaVelhaMain {
 		playerName = JOptionPane.showInputDialog(null, "What is your name?", TITLE, 3);
 		} 
 		
+		//special cheat to get two computers to play against each other :)
+		if (playerName.equals("Wilson")) {
+			return new Player('X');
+		}
 		if (JOptionPane.showConfirmDialog(null, "Do you want to be the Xs?", TITLE, JOptionPane.YES_NO_OPTION) == 0) {
 			player = new Player('X', playerName);
 		} else {

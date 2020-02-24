@@ -159,6 +159,10 @@ public class Player {
 			return move;
 		} 
 		
+		if (board.getRound() < 4 ) {
+			return makeFirstMoveAsPlayer1();
+		}
+		
 		return  findAnEmptySquare(board);
 			
 	}
@@ -271,7 +275,6 @@ public class Player {
 		int moveY = 0;
 		int counter = 0;
 		for (int [] i : DIAGONALONE) {
-			counter = 0;
 				if (board.getTile(i[0],i[1]) == team) {
 					counter++;
 				} else if (board.getTile(i[0],i[1]) == 0) {
@@ -284,9 +287,9 @@ public class Player {
 			if (counter == 2) {
 				return new Move(moveX, moveY, this.playerTeam);
 			}
-	
+		counter = 0;
 		for (int [] i : DIAGONALTWO) {
-			counter = 0;
+			
 			if (board.getTile(i[0],i[1]) == team) {
 				counter++;
 			} else if (board.getTile(i[0],i[1]) == 0) {

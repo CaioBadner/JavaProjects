@@ -45,6 +45,13 @@ public class PathFinder {
 			return "\nOk, I am lost, I give up... How can I get out of here?!";
 		}
 		
+		
+		if (y < maze[0].length - 1) {
+			
+			if (maze[x][y+1] && origin != 'E') {
+				return path + findPath(x,y+1, 'W',++counter);
+			}
+		}
 		if (x < maze.length - 1) {
 			
 			if (maze[x+1][y] && origin != 'S') {
@@ -52,12 +59,6 @@ public class PathFinder {
 			}
 			
 		}	
-		if (y < maze[0].length - 1) {
-			
-			if (maze[x][y+1] && origin != 'E') {
-				return path + findPath(x,y+1, 'W',++counter);
-			}
-		}
 		if (x > 0) {
 			
 			if (maze[x-1][y] && origin != 'N') {

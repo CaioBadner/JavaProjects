@@ -92,7 +92,7 @@ public static Maze mazeManager;
 		}
 		
 		//System.out.println(counter);
-		if (counter > 200) {
+		if (counter > 300) {
 			JOptionPane.showMessageDialog(null, "Ok, I am lost, I give up... How can I get out of here?!" 
 										+ "\n " + playerOneRoundScore, View.TITLE, 1);
 			return;
@@ -138,7 +138,7 @@ public static Maze mazeManager;
 			
 			if (shouldIBother) {
 				//and here he checks to see what was the path that he took the least number of times
-				for (int dir = 0; dir < possibleDirections.length; dir++) {
+				for (int dir = possibleDirections.length - 1; dir >= 0; dir--) {
 					if (possibleDirections[dir]) {
 						if (pathsAlreadyTaken[dir] < pathLeastTaken) {
 							pathLeastTaken = pathsAlreadyTaken[dir];
@@ -147,12 +147,14 @@ public static Maze mazeManager;
 						}
 					}	
 				}
+				
 				//and now we eliminate every option that isn't FutureDirection
 				for (int dir = 0; dir < possibleDirections.length; dir++) {
 					if (dir != futureDir) {
-					possibleDirections[dir] = false;
+						possibleDirections[dir] = false;
 					}
 				}
+				
 			}	
 				
 		}
@@ -160,8 +162,12 @@ public static Maze mazeManager;
 		//and here he is just sent to the one possibleDirection left;
 		for (int dir = 0; dir < possibleDirections.length; dir++) {
  			if(possibleDirections[dir]) {
+ 				//here we add the information about this crossRoad to the crossRoads book
  				if (intersectionCounter > 1) {
  					//JOptionPane.showMessageDialog(null, "[" + x + "," + y + "] \n TSOMET FARADIZ", View.TITLE, 1);
+ 					
+ 					//we remember where we came from and where we went
+ 					crossRoads.add(new int[]{x,y,origin});
  					crossRoads.add(new int[]{x,y,dir});
  				}
  				findPath(x+DIRECTIONS[dir][0],y+DIRECTIONS[dir][1],dir+2,++counter, crossRoads);

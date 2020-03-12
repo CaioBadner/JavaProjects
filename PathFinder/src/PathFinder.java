@@ -64,7 +64,7 @@ public static Maze mazeManager;
 				
 		playerOneScore += playerOneRoundScore;
 		playerTwoScore += playerTwoRoundScore;
-		System.out.println("Playing at Maze = " + Maze.getMazeName() + "\nThe result was      FindPath - " + playerOneRoundScore + "\n     		    FindTheExit - " + playerTwoRoundScore);
+		System.out.println("Playing at Maze = " + Maze.getMazeName() + "\nThe result was      PathFinder - " + playerOneRoundScore + "\n     		    FindTheExit - " + playerTwoRoundScore);
 		System.out.println("\nThe overall score is PathFinder - " + playerOneScore + "\n     		    FindTheExit - " + playerTwoScore);
 		playerOneRoundScore = 0;
 		playerTwoRoundScore = 0;

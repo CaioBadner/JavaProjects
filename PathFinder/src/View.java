@@ -1,12 +1,21 @@
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 
 import javax.swing.BorderFactory;
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -14,16 +23,23 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.SwingConstants;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 
 public class View {
 	
 	private JFrame frame;
+	private JFrame aboutFrame;
 	private JPanel mainPanel;
 	private JPanel gamePanel;
+	private JPanel aboutPanel;
 	private static JButton [][] buttonField;
 	private JPanel titlePanel;
-	private JLabel title;
+	private JLabel titleLabel;
+	private JLabel mapLabel;
+	private JLabel aboutLabel;
+	private JButton okButton;
 	
 	private int fieldLength;
 	private int buttonSize;
@@ -32,19 +48,24 @@ public class View {
 	private JMenuItem resetPath;
 	private JMenuItem preferences;
 	private JMenuItem quit;
-	private JMenu maze;
+	private JMenu mazeMenu;
 	private JMenuItem resetMaze;
 	private JMenuItem loadMaze;
 	private JMenuItem saveMaze;
 	private JMenu help;
 	private JMenuItem howToPlay;
 	private JMenuItem about;
+	
+	
 	public final static String TITLE = "PathFinder 1.0";
+	public final static int DEFAULT_FIELD_LENGTH = 10;
+	public final static int DEFAULT_BUTTON_SIZE = 30;
+	
 	
 	public View() {
 		
-	fieldLength = 10;
-	buttonSize = 30;
+	fieldLength = DEFAULT_FIELD_LENGTH;
+	buttonSize = DEFAULT_BUTTON_SIZE;
 	frame = new JFrame();
 	frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	frame.setTitle(TITLE);
@@ -59,12 +80,23 @@ public class View {
     frame.getContentPane().add(mainPanel);
   	
     titlePanel = new JPanel();
-	title = new JLabel("<html><span style='color: Orange;'><b>PathFinder 1.0</b></span></html>");
-    title.setFont (new Font(Font.SANS_SERIF,0,40));
-    title.setSize(700,100);
-    title.setOpaque(true);
-    title.setBackground(new Color(0));
-    titlePanel.add(title);
+    titlePanel.setLayout(new BoxLayout(titlePanel, BoxLayout.Y_AXIS));
+	titleLabel = new JLabel("", SwingConstants.CENTER);
+    titleLabel.setOpaque(true);
+    titleLabel.setBackground(Color.BLACK);
+    titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+    titleLabel.setText("<html><head><style>h1{text-align:center;}h1{font-size:50px;}h1{color:orange;}</style><h1><b>PathFinder 1.0</b></h1></head></html>");
+    
+    mapLabel = new JLabel("", SwingConstants.LEFT);
+    mapLabel.setFont (new Font(Font.SANS_SERIF,0,14));
+    mapLabel.setOpaque(true);
+    mapLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+    mapLabel.setText(" ");
+    titlePanel.add(titleLabel);
+    titlePanel.add(Box.createVerticalStrut(5));
+    titlePanel.add(mapLabel);
+    titlePanel.add(Box.createVerticalStrut(5));
+    
    
     gamePanel = new JPanel(new GridLayout(fieldLength,fieldLength));
     buttonField = getField(fieldLength);
@@ -90,28 +122,35 @@ public class View {
 				tile.addActionListener(new ActionListener() {
 					@Override
 					public void actionPerformed(ActionEvent e) {
-						if (tile.getText() == ">") {
-							resetPath();
-							PathFinder.updateMaze(getMazePicture());
+						if (tile.getText() != ">") {
+							String mazeName = Maze.getMazeName();
+							if (!mazeName.endsWith("*")) {
+								Maze.setMazeName(mazeName + "*");
+								mapLabel.setText( mazeName + "*.maze");
+							}
+							if (tile.getBackground() == Color.BLACK) {
+								tile.setBackground(Color.WHITE);
+							} else {
+								tile.setBackground(Color.BLACK);
+							}
+						} else {	
+							erasePath();
+							Maze.setMaze(getMazePicture());
+							PathFinder.updateMaze();
 							PathFinder.runMaze();
-						} else if (tile.getBackground() == Color.BLACK) {
-							tile.setBackground(Color.WHITE);
-						} else {
-							tile.setBackground(Color.BLACK);
-						}
-						
+						} 
 					}
 				});
 				
 				if (i == 0 && j == 0) {
 					tile.setText(">");
-				} else if (i == PathFinder.maze.length - 1 && j == PathFinder.maze[0].length - 1) {
+				} else if (i == Maze.getLength() - 1 && j == Maze.getLength() - 1) {
 					tile.setText(">");
 				}
 					
 					
-				if (i < PathFinder.maze.length && j < PathFinder.maze[0].length) {
-					if (PathFinder.maze[i][j] == true) {
+				if (i < size && j < size) {
+					if (Maze.getMaze()[i][j]) {
 						tile.setBackground(Color.WHITE);
 					} else {
 						tile.setBackground(Color.BLACK);
@@ -128,20 +167,7 @@ public class View {
 		return field;
 	}
 	
-	public static void leaveMark(int x, int y) {
-		
-		if (x == PathFinder.maze.length - 1 && y == x) {
-			buttonField[x][y].setBackground(Color.GREEN);
-		}
-		
-		if (buttonField[x][y].getBackground() == Color.WHITE) {
-			buttonField[x][y].setBackground(Color.YELLOW);
-		} else if (buttonField[x][y].getBackground() == Color.YELLOW) {
-			buttonField[x][y].setBackground(Color.ORANGE);
-		} else if (buttonField[x][y].getBackground() == Color.ORANGE) {
-			buttonField[x][y].setBackground(Color.RED);	
-		} 
-	}
+	
 	
 private void intializeMenuBar() {
 		
@@ -152,7 +178,7 @@ private void intializeMenuBar() {
 		resetPath.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				resetPath();
+				erasePath();
 			}
 
 			
@@ -181,37 +207,144 @@ private void intializeMenuBar() {
 		pathFinder.add(preferences);
 		pathFinder.add(quit);
 		
-		maze = new JMenu("Maze");
+		mazeMenu = new JMenu("Maze");
 		resetMaze = new JMenuItem("Reset Maze");
 		resetMaze.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				if (JOptionPane.showConfirmDialog(null, "Are you sure you want to erase this map?", 
+						TITLE , JOptionPane.YES_NO_OPTION) == 0) {
 				resetButtonField();
+				mapLabel.setText("newMaze.maze");
+				
+				}
 			}
 		});
 		loadMaze = new JMenuItem("Load Maze");
 		loadMaze.addActionListener(new ActionListener() {
 			@Override
-			public void actionPerformed(ActionEvent e) {
-				if (JOptionPane.showConfirmDialog(null, "Do you want to save this maze before loading a new one?", 
-						TITLE , JOptionPane.YES_NO_OPTION) == 1) {
-					PathFinder.updateMaze(Maze.maze01);
-					updateButtonField();
+			public void actionPerformed(ActionEvent e) {				
+				if (mapLabel.getText().contains("*")) {
+					if (JOptionPane.showConfirmDialog(null, "This maze hasn't been saved yet. "
+						+ "\nWould you like to save it before loading a new one?"
+							, TITLE , JOptionPane.YES_NO_OPTION) == 0) {
+						saveMaze.doClick();
+					} 
+				} 
+				
+				JFileChooser jfc = new JFileChooser("C://Users//caio//Desktop//PathFinder//Mazes//");
+				jfc.setDialogTitle("Select a maze");
+				jfc.setAcceptAllFileFilterUsed(false);
+				FileNameExtensionFilter filter = new FileNameExtensionFilter("MAZE files", "maze");
+				jfc.setFileFilter(filter);
+				int returnValue = jfc.showOpenDialog(null);
+				
+				if (returnValue == JFileChooser.APPROVE_OPTION) {
+					
+					File selectedFile = jfc.getSelectedFile();
+					BufferedReader reader = null;
+					
+					try {
+						reader = new BufferedReader(new FileReader(selectedFile));
+					} catch (FileNotFoundException e2) {
+						e2.printStackTrace();
+						return;
+					}
+					
+					String line = null;
+					
+					try {
+						line = reader.readLine();
+					} catch (IOException e2) {
+						e2.printStackTrace();
+						
+					}
+					
+					String newMazeName = line;
+					
+					try {
+						line = reader.readLine();
+					} catch (IOException e2) {
+						e2.printStackTrace();
+						
+					}
+					
+					int newLength;
+					try {
+						newLength = Integer.parseInt(line);
+					} catch (NumberFormatException e3) {
+						newLength = -1;
+					}
+					if (buttonField.length != newLength) {
+						//this version still doesnt allow for different maze sizes
+						JOptionPane.showMessageDialog(null, "The size of the maze is incorrect for this board", TITLE, 0);
+						//future implementation will regenerate the button field with the new maze's length and then 
+						//load the whole frame correctly again
+						//buttonField = getField(newLength);
+					  	
+					} else {
+						
+						boolean[][] newMaze = new boolean[newLength][newLength];
+						
+						for (int row = 0; row < newMaze.length; row++) {
+							try {
+								line = reader.readLine();
+							} catch (IOException e2) {
+								e2.printStackTrace();
+								break;
+							}
+							newMaze = turnLineIntoMazeRow(newMaze, line, row);
+						}
+						
+						try {
+							reader.close();
+						} catch (IOException e1) {
+							e1.printStackTrace();
+						}
+						
+						Maze.setFullMaze(newMazeName, newMaze);
+						PathFinder.updateMaze();
+						updateButtonField();
+						mapLabel.setText(Maze.getMazeName() + ".maze");
+						System.out.println("Maze " + Maze.getMazeName() + ".maze was loaded successfully!");
+					}
 				}
+				
+				
+						
+				
+			}
+
+			private boolean[][] turnLineIntoMazeRow(boolean[][] newMaze, String line, int rowNum) {
+				for (int y = 0; y < newMaze[0].length; y++) {
+					if (line.charAt(y) == '1') {
+						newMaze[rowNum][y] = true;
+					}
+				}
+				return newMaze;
 			}
 		});
+		
 		saveMaze = new JMenuItem("Save Maze");
 		saveMaze.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				JOptionPane.showInputDialog(null, "What do you call this maze?", 
-						TITLE , JOptionPane.OK_CANCEL_OPTION);
+				Maze.setMazeName(JOptionPane.showInputDialog(null, "Please choose a name for this map:", 
+						TITLE , JOptionPane.OK_CANCEL_OPTION));
+				erasePath();
+				try {
+					createNewFile(Maze.getMazeName(), Maze.getLength(), getMazePicture());
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
+				mapLabel.setText(Maze.getMazeName() + ".maze");
 			}
+
 		});
 		
-		maze.add(resetMaze);
-		maze.add(loadMaze);
-		maze.add(saveMaze);
+		mazeMenu.add(resetMaze);
+		mazeMenu.add(loadMaze);
+		mazeMenu.add(saveMaze);
 		
 		
 		help = new JMenu("Help");
@@ -234,16 +367,13 @@ private void intializeMenuBar() {
 				showAbout();
 			}
 
-			private void showAbout() {
-				// TODO Auto-generated method stub
-				
-			}
+			
 		});
 		help.add(howToPlay);
 		help.add(about);
 		
 		menuBar.add(pathFinder);
-		menuBar.add(maze);
+		menuBar.add(mazeMenu);
 		menuBar.add(help);
 		frame.setJMenuBar(menuBar);
 	}
@@ -271,7 +401,7 @@ private void intializeMenuBar() {
 		buttonField[buttonField.length-1][buttonField[0].length-1].setBackground(Color.WHITE);
 	}
 
-	private void resetPath() {
+	public static void erasePath() {
 		for (int x = 0; x < buttonField.length; x++) {
 			for (int y = 0; y < buttonField[0].length; y++) {
 				if (buttonField[x][y].getBackground() != Color.WHITE && 
@@ -284,6 +414,45 @@ private void intializeMenuBar() {
 		
 	}
 
+	private void showAbout() {
+		aboutFrame = new JFrame();
+		aboutFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		aboutFrame.setTitle(TITLE);
+		aboutFrame.setLocation(480,300);
+		aboutFrame.setResizable(false);
+		
+		aboutPanel = new JPanel();
+		aboutPanel.setLayout(new BoxLayout(aboutPanel, BoxLayout.Y_AXIS));
+		aboutPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+	    
+		
+	    aboutLabel = new JLabel();
+	    aboutLabel.setText("<html><body><br>PathFinder 1.0<br><br>Made by Caio Badner<br><br>in Caesarea, Israel 2020<br></body></html>");
+	    aboutLabel.setFont (new Font(Font.SANS_SERIF,0,25));
+	    aboutLabel.setOpaque(true);
+	    aboutLabel.setBackground(Color.ORANGE);
+	    
+	    okButton = new JButton();
+	    okButton.setText("Ok");
+	    okButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+	    okButton.addActionListener(new ActionListener() {
+	    	@Override
+	    	public void actionPerformed(ActionEvent e) {
+				aboutFrame.dispose();
+			}
+		});
+	    
+	    aboutPanel.add(aboutLabel);
+	    aboutPanel.add(Box.createVerticalStrut(10));
+	    aboutPanel.add(okButton);
+	    aboutPanel.add(Box.createVerticalStrut(10));
+	    
+	    aboutFrame.getContentPane().add(aboutPanel);
+	    aboutFrame.pack();
+	    aboutFrame.setVisible(true);
+	}
+	
+	
 	public boolean [][] getMazePicture() {
 		boolean [][] mazePicture = new boolean [buttonField.length][buttonField.length];
 		
@@ -296,4 +465,54 @@ private void intializeMenuBar() {
 		}
 		return mazePicture;
 	}
+
+	public static void leaveMark(int x, int y) {
+		
+		if (x == PathFinder.maze.length - 1 && y == x) {
+			buttonField[x][y].setBackground(Color.GREEN);
+		}
+		
+		if (buttonField[x][y].getBackground() == Color.WHITE /*|| buttonField[x][y].getBackground() == Color.BLACK*/) {
+			buttonField[x][y].setBackground(Color.YELLOW);
+		} else if (buttonField[x][y].getBackground() == Color.YELLOW) {
+			buttonField[x][y].setBackground(Color.ORANGE);
+		} else if (buttonField[x][y].getBackground() == Color.ORANGE) {
+			buttonField[x][y].setBackground(Color.RED);	
+		} else if (buttonField[x][y].getBackground() == Color.RED) {
+			buttonField[x][y].setBackground(Color.MAGENTA);
+		} else if (buttonField[x][y].getBackground() == Color.MAGENTA) {
+			buttonField[x][y].setBackground(Color.CYAN);
+		} else if (buttonField[x][y].getBackground() == Color.CYAN) {
+			buttonField[x][y].setBackground(Color.BLUE);
+		} 
+	}
+	
+	private static void createNewFile(String mazeName, int length, boolean[][] mazePicture) throws IOException  {
+	          
+		File file = new File("C://Users//caio//Desktop//PathFinder//Mazes//" + mazeName + ".maze");
+	  
+          //Create the file
+          if (file.createNewFile()){
+            System.out.println("Maze " + mazeName + ".maze was created successfully!");
+            
+          }else{
+            System.out.println("Error");
+          }
+           
+          FileWriter writer = new FileWriter(file);
+          writer.write(mazeName + "\n");
+          writer.write("" + length + "\n");
+          for (int x = 0; x < mazePicture.length; x++) {
+			for (int y = 0; y < mazePicture[0].length; y++) {
+				if (mazePicture[x][y]) {
+					writer.write("1");
+				} else {
+					writer.write("0");
+				} 
+			}
+			writer.write("\n");
+          }	
+          writer.close();
+	}
+
 }

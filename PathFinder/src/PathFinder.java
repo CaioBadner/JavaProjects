@@ -9,8 +9,8 @@ public static boolean [][] maze;
 public static int playerOneScore = 0, playerTwoScore = 0, 
 				  playerOneRoundScore = 0, playerTwoRoundScore = 0;
 
-										  /*S*/  /*E*/  /*N*/  /*W*/
-									   /*   0      1      2      3   */
+			        	  /*S*/  /*E*/  /*N*/  /*W*/
+				       /*   0      1      2      3   */
 public final static int[][] DIRECTIONS = {{1,0},{0,1},{-1,0},{0,-1}};
 
 public static Maze mazeManager;

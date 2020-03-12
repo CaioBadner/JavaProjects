@@ -15,3 +15,5 @@ Future implementation will include
 Current version only allows for 10x10 mazes but finished version will allow for potentially indefinite(*) number of squares to make up the maze.
 
 Class PathFinder contains code written mostly by me (Caio Badner) and the method findTheExit that was adapted from a program written by Dean Dall.
+
+This is an ongoing project that welcomes collaboration :)

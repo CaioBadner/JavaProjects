@@ -8,15 +8,15 @@ public class Maze {
 	private final static int DEFAULT_LENGTH = 10;
 	private final static String DEFAULT_NAME = "NewMaze";
 	public static final boolean [] [] DEFAULT_MAZE ={{true,true,true,false,true,false,true,true,true,true},
-													{true,false,true,false,true,false,true,false,false,true},
-													{true,false,true,true,true,true,true,false,true,true},
-													{true,true,false,true,false,false,true,true,false,false},
-													{false,true,false,false,true,false,false,true,true,true},     
-													{false,true,false,true,true,true,false,true,false,true},
-													{true,true,false,true,false,true,true,true,false,true},
-													{true,false,true,true,true,true,false,true,true,true},
-													{true,false,false,false,false,true,false,true,false,false},
-													{true,true,true,true,true,true,false,true,true,true}};
+							{true,false,true,false,true,false,true,false,false,true},
+							{true,false,true,true,true,true,true,false,true,true},
+							{true,true,false,true,false,false,true,true,false,false},
+							{false,true,false,false,true,false,false,true,true,true},     
+							{false,true,false,true,true,true,false,true,false,true},
+							{true,true,false,true,false,true,true,true,false,true},
+							{true,false,true,true,true,true,false,true,true,true},
+							{true,false,false,false,false,true,false,true,false,false},
+							{true,true,true,true,true,true,false,true,true,true}};
 
 	
 	public Maze (boolean isDefault) {

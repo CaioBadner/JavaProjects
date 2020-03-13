@@ -45,6 +45,7 @@ public class View {
 	private int buttonSize;
 	private JMenuBar menuBar;
 	private JMenu pathFinder;
+	private JMenuItem runPath;
 	private JMenuItem resetPath;
 	private JMenuItem preferences;
 	private JMenuItem quit;
@@ -133,11 +134,9 @@ public class View {
 							} else {
 								tile.setBackground(Color.BLACK);
 							}
-						} else {	
-							erasePath();
-							Maze.setMaze(getMazePicture());
-							PathFinder.updateMaze();
-							PathFinder.runMaze();
+						} else {
+							runPath();
+							
 						} 
 					}
 				});
@@ -169,11 +168,29 @@ public class View {
 	
 	
 	
+private void runPath() {
+	erasePath();
+	Maze.setMaze(getMazePicture());
+	PathFinder.updateMaze();
+	PathFinder.runMaze();
+}
+
+
+
 private void intializeMenuBar() {
 		
 		menuBar = new JMenuBar();
 		
 		pathFinder = new JMenu("PathFinder");
+		runPath = new JMenuItem("Run Path");
+		runPath.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				runPath();
+			}
+
+			
+		});
 		resetPath = new JMenuItem("Reset Path");
 		resetPath.addActionListener(new ActionListener() {
 			@Override
@@ -203,6 +220,7 @@ private void intializeMenuBar() {
 				System.exit(0);
 			}
 		});
+		pathFinder.add(runPath);
 		pathFinder.add(resetPath);
 		pathFinder.add(preferences);
 		pathFinder.add(quit);

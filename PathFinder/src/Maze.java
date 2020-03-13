@@ -7,13 +7,29 @@ public class Maze {
 	
 	private final static int DEFAULT_LENGTH = 10;
 	private final static String DEFAULT_NAME = "NewMaze";
+	public static final boolean [] [] DEFAULT_MAZE ={{true,true,true,false,true,false,true,true,true,true},
+													{true,false,true,false,true,false,true,false,false,true},
+													{true,false,true,true,true,true,true,false,true,true},
+													{true,true,false,true,false,false,true,true,false,false},
+													{false,true,false,false,true,false,false,true,true,true},     
+													{false,true,false,true,true,true,false,true,false,true},
+													{true,true,false,true,false,true,true,true,false,true},
+													{true,false,true,true,true,true,false,true,true,true},
+													{true,false,false,false,false,true,false,true,false,false},
+													{true,true,true,true,true,true,false,true,true,true}};
+
 	
-	public Maze () {
+	public Maze (boolean isDefault) {
 		Maze.mazeName = DEFAULT_NAME;
 		Maze.length = DEFAULT_LENGTH;
+		
+		if (isDefault) {
+			Maze.maze = DEFAULT_MAZE;
+		} else {
 		Maze.maze = new boolean [DEFAULT_LENGTH][DEFAULT_LENGTH];
 		Maze.maze[0][0] = true;
 		Maze.maze[DEFAULT_LENGTH-1][DEFAULT_LENGTH-1] = true;
+		}
 	}
 	
 	public static void setFullMaze (String newMazeName, int newLength, boolean[][] newMaze) {
@@ -61,19 +77,5 @@ public class Maze {
 		}
 		return mazeCopy;
 	}
-
-	//the classic maze that it still remembers for good old times
-	public static final boolean [] [] maze01 =     {{true,true,true,false,true,false,true,true,true,true},
-													{true,false,true,false,true,false,true,false,false,true},
-													{true,false,true,true,true,true,true,false,true,true},
-													{true,true,false,true,false,false,true,true,false,false},
-									  				{false,true,false,false,true,false,false,true,true,true},     
-													{false,true,false,true,true,true,false,true,false,true},
-													{true,true,false,true,false,true,true,true,false,true},
-													{true,false,true,true,true,true,false,true,true,true},
-													{true,false,false,false,false,true,false,true,false,false},
-													{true,true,true,true,true,true,false,true,true,true}};
-	
-
 
 }

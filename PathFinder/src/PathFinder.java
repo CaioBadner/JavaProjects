@@ -1,5 +1,3 @@
-import java.util.List;
-import java.util.ArrayList;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
@@ -9,14 +7,14 @@ public static boolean [][] maze;
 public static int playerOneScore = 0, playerTwoScore = 0, 
 				  playerOneRoundScore = 0, playerTwoRoundScore = 0;
 
-			        	  /*S*/  /*E*/  /*N*/  /*W*/
-				       /*   0      1      2      3   */
+										  /*S*/  /*E*/  /*N*/  /*W*/
+									   /*   0      1      2      3   */
 public final static int[][] DIRECTIONS = {{1,0},{0,1},{-1,0},{0,-1}};
 
 public static Maze mazeManager;
 
 	public static void main(String[] args) {
-		mazeManager = new Maze();
+		mazeManager = new Maze(true);
 		maze = Maze.getMaze();
 		
 		SwingUtilities.invokeLater(new Runnable() {
@@ -33,19 +31,7 @@ public static Maze mazeManager;
 	}
 	
 	public static void runMaze() {
-		//Maze.printMaze(maze);
-		List<int[]> crossRoads = new ArrayList<int[]>();
-		
-		/*
-		System.out.println();
-		System.out.print("Dean thinks that '" + Maze.getMazeName() + " can ");
-		if (!findTheExit(Maze.getMazeCopy(), 9, 9)) {
-			System.out.print(" NOT ");
-		} else {
-			System.out.println();
-		}
-		System.out.print(" be solved!");
-		*/
+		int[][][] crossRoads = new int[10][10][4];
 		
 		//Player One
 		findPath(0,0,3,0, crossRoads);
@@ -53,14 +39,13 @@ public static Maze mazeManager;
 		View.erasePath();
 		
 		//Player Two
-		
-		if (findTheExit(Maze.getMazeCopy(), 0, 0)) {
-			JOptionPane.showMessageDialog(null, "Maze is solvable." 
-						+ "\n " + playerTwoRoundScore, "FindTheExit", 1);
-		} else {
-			JOptionPane.showMessageDialog(null, "Maze is not solvable." 
-						+ "\n " + playerTwoRoundScore, "FindTheExit", 2);
+		String strNot = "";
+		if (!findTheExit(Maze.getMazeCopy(), 0, 0)) {
+			strNot = "NOT ";
 		}
+			JOptionPane.showMessageDialog(null, "Maze is " + strNot + "solvable." 
+						+ "\n " + playerTwoRoundScore, "FindTheExit", 2);
+		
 				
 		playerOneScore += playerOneRoundScore;
 		playerTwoScore += playerTwoRoundScore;
@@ -71,9 +56,8 @@ public static Maze mazeManager;
 		System.out.println();
 	}
 	
-	//My Code
-	//PathFinder ver0.85 alpha
-	public static void findPath(int x, int y, int origin, int counter, List<int[]> crossRoads) {
+	//PathFinder ver0.95 alpha
+	public static void findPath(int x, int y, int origin, int counter, int[][][] crossRoads) {
 		//this header is for game purposes only
 		playerOneRoundScore++;
 		View.leaveMark(x,y);
@@ -91,6 +75,7 @@ public static Maze mazeManager;
 			return;
 		}
 		
+		//This is what kills the recursion when we reach a certain mark
 		//System.out.println(counter);
 		if (counter > 300) {
 			JOptionPane.showMessageDialog(null, "Ok, I am lost, I give up... How can I get out of here?!" 
@@ -119,69 +104,43 @@ public static Maze mazeManager;
 				}
 			}
 		}
+		//if he came to a dead end then he goes back from where he came from
+		if (intersectionCounter == 0) {
+			findPath(x+DIRECTIONS[origin][0],y+DIRECTIONS[origin][1],origin+2,++counter, crossRoads);
+			return;
+		}
 		
-		//then he checks his cross roads map and he see if he should cancel any of the directions
-		if (intersectionCounter > 1 && crossRoads.size() > 0) {
-			int[] pathsAlreadyTaken = new int [4];
-			int pathLeastTaken = 4;
-			int futureDir = -1;
-			boolean shouldIBother = false;
-			
-			//here he adds the number of times he was at this same intersection
-			//saving this number in an array according to the direction he took on previous times
-			for (int [] oldPathChoice : crossRoads) {
-				if (oldPathChoice[0] == x && oldPathChoice[1] == y) {
-					pathsAlreadyTaken[oldPathChoice[2]]++;
-					shouldIBother = true;
+		//if the result is one then he gets sent to that one possible place
+		if (intersectionCounter == 1) {
+			for (int dir = 0; dir < possibleDirections.length; dir++) {
+	 			if(possibleDirections[dir]) {
+	 				findPath(x+DIRECTIONS[dir][0],y+DIRECTIONS[dir][1],dir+2,++counter, crossRoads);
+	 				return;
+	 			}
+			}
+		}
+		//if we made it here then we are standing at a cross roads, 
+		//so first thing is to make a quick note that we arrived 
+		crossRoads[x][y][origin]++;
+		
+		//Now he will make another check comparing with the previews times he was here
+		int pathLeastTaken = 10;
+		int futureDir = origin;
+		for (int dir = 0; dir < possibleDirections.length; dir++) {
+			if (possibleDirections[dir]) {
+				if (crossRoads[x][y][dir] < pathLeastTaken) {
+					pathLeastTaken = crossRoads[x][y][dir];
+					futureDir = dir;
 				}
 			}
-			
-			if (shouldIBother) {
-				//and here he checks to see what was the path that he took the least number of times
-				for (int dir = possibleDirections.length - 1; dir >= 0; dir--) {
-					if (possibleDirections[dir]) {
-						if (pathsAlreadyTaken[dir] < pathLeastTaken) {
-							pathLeastTaken = pathsAlreadyTaken[dir];
-							futureDir = dir;
-							
-						}
-					}	
-				}
-				
-				//and now we eliminate every option that isn't FutureDirection
-				for (int dir = 0; dir < possibleDirections.length; dir++) {
-					if (dir != futureDir) {
-						possibleDirections[dir] = false;
-					}
-				}
-				
-			}	
-				
 		}
-		
-		//and here he is just sent to the one possibleDirection left;
-		for (int dir = 0; dir < possibleDirections.length; dir++) {
- 			if(possibleDirections[dir]) {
- 				//here we add the information about this crossRoad to the crossRoads book
- 				if (intersectionCounter > 1) {
- 					//JOptionPane.showMessageDialog(null, "[" + x + "," + y + "] \n TSOMET FARADIZ", View.TITLE, 1);
- 					
- 					//we remember where we came from and where we went
- 					crossRoads.add(new int[]{x,y,origin});
- 					crossRoads.add(new int[]{x,y,dir});
- 				}
- 				findPath(x+DIRECTIONS[dir][0],y+DIRECTIONS[dir][1],dir+2,++counter, crossRoads);
- 				return;
- 			}
-		}
-		findPath(x,y,origin+2,++counter, crossRoads);
+		//here we make another annotation to the crossRoads map before we go to our new direction
+		crossRoads[x][y][futureDir]++;
+		findPath(x+DIRECTIONS[futureDir][0],y+DIRECTIONS[futureDir][1],futureDir+2,++counter, crossRoads);
 		return;
-		
-		
-		
-		
 	}
-	
+
+
 	//Dean's code (inverted values so it starts from 0,0 and chases the last cell)
 	public static boolean findTheExit(boolean[][] matrix, int row, int col) {
 		

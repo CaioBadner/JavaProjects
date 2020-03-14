@@ -348,7 +348,8 @@ private void intializeMenuBar() {
 			public void actionPerformed(ActionEvent e) {
 				String strMazeName = JOptionPane.showInputDialog(null, "Please choose a name for this map:", 
 						TITLE , JOptionPane.OK_CANCEL_OPTION);
-				if (strMazeName != null) {		
+				if (strMazeName != null) {
+					Maze.setMazeName(strMazeName);
 					erasePath();
 					try {
 						createNewFile(Maze.getMazeName(), Maze.getLength(), getMazePicture());

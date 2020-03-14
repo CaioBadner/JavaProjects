@@ -26,7 +26,6 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-
 public class View {
 	
 	private JFrame frame;
@@ -347,15 +346,17 @@ private void intializeMenuBar() {
 		saveMaze.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				Maze.setMazeName(JOptionPane.showInputDialog(null, "Please choose a name for this map:", 
-						TITLE , JOptionPane.OK_CANCEL_OPTION));
-				erasePath();
-				try {
-					createNewFile(Maze.getMazeName(), Maze.getLength(), getMazePicture());
-				} catch (IOException e1) {
-					e1.printStackTrace();
+				String strMazeName = JOptionPane.showInputDialog(null, "Please choose a name for this map:", 
+						TITLE , JOptionPane.OK_CANCEL_OPTION);
+				if (strMazeName != null) {		
+					erasePath();
+					try {
+						createNewFile(Maze.getMazeName(), Maze.getLength(), getMazePicture());
+					} catch (IOException e1) {
+						e1.printStackTrace();
+					}
+					mapLabel.setText(Maze.getMazeName() + ".maze");
 				}
-				mapLabel.setText(Maze.getMazeName() + ".maze");
 			}
 
 		});
@@ -502,7 +503,7 @@ private void intializeMenuBar() {
 			buttonField[x][y].setBackground(Color.CYAN);
 		} else if (buttonField[x][y].getBackground() == Color.CYAN) {
 			buttonField[x][y].setBackground(Color.BLUE);
-		} 
+		}
 	}
 	
 	private static void createNewFile(String mazeName, int length, boolean[][] mazePicture) throws IOException  {
